@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2020/12/28 16:16:26 by acastelb         ###   ########.fr       */
+/*   Updated: 2020/12/29 10:01:42 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,6 @@ int			main(void)
 	t_vars	vars;
 
 	vars.mlx = mlx_init();
-	vars.win = mlx_new_window(vars.mlx, 1920, 1080, "Hello world!");
-	mlx_loop_hook(vars.mlx, render_next_frame, &vars);
+	vars.win = mlx_new_window(vars.mlx, 920, 500, "Hello world!");
 	mlx_loop(vars.mlx);
 }
