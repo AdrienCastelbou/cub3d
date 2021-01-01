@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2020/12/31 15:31:09 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/01 14:50:13 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ const	int grid[MAP_ROWS][MAP_COLS] = {
 	};
 
 typedef struct s_player {
-	int			x;
-	int			y;
+	double			x;
+	double			y;
 	int			radius;
 	int			turn_direction;
 	int			walk_direction;
