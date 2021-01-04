@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/01 14:50:13 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/04 19:24:28 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,9 +183,9 @@ int ft_abs(int nb)
 double	ft_abs_angle(double ray_angle)
 {
 	ray_angle /= (2 * M_PI);
-	if (angle < 0)
-		angle += (2 * M_PI);
-	return (angle);
+	if (ray_angle < 0)
+		ray_angle += (2 * M_PI);
+	return (ray_angle);
 }
 int		check_horizontal_hit(t_ray *ray, t_player *player)
 {
@@ -197,13 +197,13 @@ int		check_horizontal_hit(t_ray *ray, t_player *player)
 	ystep = tile_size;
 	if (ray->is_go_down == 0)
 		ystep *= -1;
-	xstep = tile_size / tan(ray_angle);
+	xstep = tile_size / tan(ray->ray_angle);
 	if ((ray->is_go_left && xstep > 0) || (!ray->is_go_left && xstep < 0))
 		xstep *= -1;
 	yintercept = player->y / tile_size * tile_size;
 	if (ray->is_go_down == 1)
 		yintercept += 32;
-	xintercept = player->x + (player->y - yintercept) / tan(ray_angle);
+	xintercept = player->x + (player->y - yintercept) / tan(ray->ray_angle);
 	while (1)
 	{
 		if (grid[yintercept / tile_size][xintercept / tile_size] == 1)
@@ -241,34 +241,34 @@ int		is_wall(t_ray *ray, t_player *player)
 	int	vertical_hit;
 
 	horizontal_hit = check_horizontal_hit(ray, player);
-	vertical_hit = check_vertical_hit(ray_angle, player);
+	//vertical_hit = check_vertical_hit(ray_angle, player);
 	if (horizontal_hit > vertical_hit)
 		return (horizontal_hit);
 	return (vertical_hit);
 }
 
-t_ray	ray_init(double ray_angle)
+t_ray	*ray_init(double ray_angle)
 {
 	t_ray *ray;
 
-	if (!(ray = malloc(sizeof(t_ray)))
+	if (!(ray = malloc(sizeof(t_ray))))
 		return (NULL);
-	ray->angle = ft_abs_angle(ray_angle);
+	ray->ray_angle = ft_abs_angle(ray_angle);
 	ray->distance = 0;
 	ray->wall_hitX = 0;
-	ray->wallhitY = 0;
-	ray->is_go_dowm = 0;
+	ray->wall_hitY = 0;
+	ray->is_go_down = 0;
 	ray->is_go_left = 0;
-	if (ray->angle > 0 && ray->angle < M_PI)
+	if (ray->ray_angle > 0 && ray->ray_angle < M_PI)
 		ray->is_go_down = 1;
-	if (ray->angle < (3 * M_PI) / 2 && ray->angle > M_PI / 2)
+	if (ray->ray_angle < (3 * M_PI) / 2 && ray->ray_angle > M_PI / 2)
 		ray->is_go_left = 1;
 	return (ray);
 }
 
 int		draw_rays(t_vars vars, t_data *img)
 {
-	t_ray rays[num_rays];
+	t_ray *rays;
 	double ray_angle;
 	int i;
 	int distance;
@@ -279,8 +279,8 @@ int		draw_rays(t_vars vars, t_data *img)
 	i  = 0;
 	while (i < num_rays)
 	{
-		rays[i] = ray_init(ray_angle);
-		distance = is_wall(rays[i], vars.player);
+		rays[i] = *ray_init(ray_angle);
+		distance = is_wall(&rays[i], vars.player);
 		rays[i].distance = distance;
 		rays[i].ray_angle = ray_angle;
 		my_mlx_pixel_put(img, vars.player->x + cos(ray_angle) * distance, vars.player->y + sin(ray_angle) * distance, 0x00FF0000);
