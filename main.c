@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/05 13:32:23 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/06 13:01:57 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -331,6 +331,12 @@ int		key_hook(int keycode, t_vars *vars)
 		vars->player->turn_direction = -1;
 	else if (keycode == 0)
 		vars->player->turn_direction = 1;
+	else if (keycode == 53)
+	{
+		free(vars->player);
+		mlx_destroy_window( vars->mlx, vars->win);
+		exit(0);
+	}
 	return (1);
 }
 
