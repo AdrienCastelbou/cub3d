@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/06 16:30:59 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/06 17:21:46 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,25 +245,37 @@ int		check_horizontal_hit(t_ray *ray, t_player *player, t_vars vars)
 	return (-1);
 }
 
-int		check_vertical_hit(double ray_angle, t_player *player)
+int		check_vertical_hit(t_ray *ray, t_player *player, t_vars vars)
 {
 	int	ystep;
 	int xstep;
 	int xintercept;
 	int yintercept;
 
+	xintercept = (get_int_value(player->x) / tile_size) * tile_size;
+	yintercept = player->y + (xintercept - player->x) * tan(ray->ray_angle);
 	xstep = tile_size;
-	ystep = tile_size * tan(ray_angle);
-	xintercept = player->x / tile_size * tile_size;
-	yintercept = player->y + (player->x - xintercept) / tan(ray_angle);
-	while (1)
+	if (ray->is_go_left)
+	{
+		xstep *= -1;
+		xintercept -= 1;
+	}
+	else
+		xintercept += tile_size;
+	ystep = tile_size * tan(ray->ray_angle);
+	if ((ray->is_go_down && ystep < 0) || (!ray->is_go_down && ystep > 0))
+		ystep *= -1;
+	while (is_in_the_grid(yintercept, xintercept))
 	{
 		if (grid[yintercept / tile_size][xintercept / tile_size] == 1)
-			return(ft_abs(player->x - xintercept));
-		xintercept += xstep;
+		{
+			my_mlx_pixel_put(vars.img, xintercept, yintercept, 0x00FF0000);
+			return (1);
+		}
 		yintercept += ystep;
+		xintercept += xstep;
 	}
-	return (0);
+	return (-1);
 }
 
 int		is_wall(t_ray *ray, t_player *player, t_vars vars)
@@ -272,7 +284,7 @@ int		is_wall(t_ray *ray, t_player *player, t_vars vars)
 	int	vertical_hit;
 
 	horizontal_hit = check_horizontal_hit(ray, player, vars);
-	//vertical_hit = check_vertical_hit(ray_angle, player);
+	//vertical_hit = check_vertical_hit(ray, player, vars);
 	//if (horizontal_hit > vertical_hit)
 	//	return (horizontal_hit);
 	//return (vertical_hit);
