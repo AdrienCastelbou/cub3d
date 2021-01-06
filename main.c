@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/06 13:01:57 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/06 16:30:59 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ const	int grid[map_rows][map_cols] = {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 	};
 
-typedef struct s_ray {
-	double ray_angle;
+typedef struct	s_ray {
+	double		ray_angle;
 	int			distance;
 	int			wall_hitX;
 	int			wall_hitY;
@@ -50,9 +50,9 @@ typedef struct s_ray {
 }				t_ray;
 
 
-typedef struct s_player {
-	double			x;
-	double			y;
+typedef struct	s_player {
+	double		x;
+	double		y;
 	int			radius;
 	int			turn_direction;
 	int			walk_direction;
@@ -69,11 +69,12 @@ typedef struct	s_data {
 	int			endian;
 }				t_data;
 
-typedef struct  s_vars {
-    void        *mlx;
-    void        *win;
+typedef struct	s_vars {
+    void		*mlx;
+    void		*win;
 	t_player	*player;
 	t_data		*img;
+	t_ray		rays[num_rays];
 }				t_vars;
 
 
@@ -298,27 +299,26 @@ t_ray	*ray_init(double ray_angle)
 	return (ray);
 }
 
-int		draw_rays(t_vars vars, t_data *img)
+int		draw_rays(t_vars *vars, t_data *img)
 {
-	t_ray rays[num_rays];
 	t_ray *ray;
 	double ray_angle;
 
-	ray_angle = vars.player->rotation_angle - (fov_angle / 2);
+	ray_angle = vars->player->rotation_angle - (fov_angle / 2);
 	ray = ray_init(ray_angle);
-	rays[0] = *ray;
-	is_wall(ray, vars.player, vars);
+	vars->rays[0] = *ray;
+	is_wall(ray, vars->player,* vars);
 	//my_mlx_pixel_put(img, vars.player->x + cos(ray_angle) * ray->distance, vars.player->y + sin(ray_angle) * ray->distance, 0x00FF0000);
 	free(ray);
 	return (1);
 }
 
-void		draw_map(t_vars vars, t_data *img)
+void		draw_map(t_vars *vars, t_data *img)
 {
-	draw_grid(vars, img);
-	draw_player(vars, img);
+	draw_grid(*vars, img);
+	draw_player(*vars, img);
 	draw_rays(vars, img);
-	mlx_put_image_to_window(vars.mlx, vars.win, img->img, 0, 0);
+	mlx_put_image_to_window(vars->mlx, vars->win, img->img, 0, 0);
 }
 
 int		key_hook(int keycode, t_vars *vars)
@@ -380,7 +380,7 @@ int		render_next_frame(t_vars *vars)
 		return (1);
 	vars->player->x += cos(vars->player->rotation_angle) * movestep;
 	vars->player->y += sin(vars->player->rotation_angle) * movestep;
-	draw_map(*vars, (vars->img));
+	draw_map(vars, (vars->img));
 	return (1);
 }
 
@@ -396,7 +396,7 @@ int			main(void)
 	img.img = mlx_new_image(vars.mlx, win_cols, win_rows);
     img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
           &img.endian);
-	draw_map(vars, &img);
+	draw_map(&vars, &img);
 	mlx_loop_hook(vars.mlx, render_next_frame, &vars);
 	mlx_loop(vars.mlx);
 }
