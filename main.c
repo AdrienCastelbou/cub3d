@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/08 17:08:39 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/09 11:21:03 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,7 @@ int		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 	ystep = tile_size;
 	if (ray->is_go_down == 1)
 		yintercept += tile_size;
-	xintercept = get_int_value(player->x + ft_abs((double)yintercept - player->y) / tan(ray->ray_angle));
+	xintercept = get_int_value(player->x + ((double)yintercept - player->y) / tan(ray->ray_angle));
 	ystep = tile_size;
 	if (ray->is_go_down == 0)
 	{
