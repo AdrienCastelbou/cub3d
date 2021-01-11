@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/09 11:21:03 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/11 14:09:29 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,9 +196,9 @@ double	ft_abs_angle(double ray_angle)
 
 int		is_in_the_grid(yintercept, xintercept)
 {
-	if (yintercept > map_rows * tile_size || yintercept < 0)
+	if (yintercept / 32 > map_rows - 1 || yintercept < 0)
 		return (0);
-	if (xintercept > map_cols * tile_size || xintercept < 0)
+	if (xintercept / 32 > map_cols - 1 || xintercept < 0)
 		return (0);
 	return (1);
 }
@@ -212,7 +212,8 @@ int get_int_value(double nb)
 		return (inted);
 	return (inted + 1);
 }
-int		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
+
+double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 {
 	int		ystep;
 	int		xstep;
@@ -220,10 +221,9 @@ int		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 	int		yintercept;
 
 	yintercept = (int)((player->y) / tile_size) * tile_size;
-	ystep = tile_size;
 	if (ray->is_go_down == 1)
 		yintercept += tile_size;
-	xintercept = get_int_value(player->x + ((double)yintercept - player->y) / tan(ray->ray_angle));
+	xintercept = (player->x + ((double)yintercept - player->y) / tan(ray->ray_angle));
 	ystep = tile_size;
 	if (ray->is_go_down == 0)
 	{
@@ -235,7 +235,7 @@ int		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 		xstep *= -1;
 	while (is_in_the_grid(yintercept, xintercept))
 	{
-		if (grid[(int)yintercept / tile_size][(int)xintercept / tile_size] == 1)
+		if (grid[yintercept / tile_size][xintercept / tile_size] == 1)
 		{
 			my_mlx_pixel_put(vars->img, xintercept, yintercept, 0x00FF0000);
 			return (1);
@@ -246,31 +246,31 @@ int		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 	return (-1);
 }
 
-int		check_vertical_hit(t_ray *ray, t_player *player, t_vars vars)
+double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 {
-	int	ystep;
-	int xstep;
-	int xintercept;
-	int yintercept;
+	int		ystep;
+	int		xstep;
+	int		xintercept;
+	int		yintercept;
 
-	xintercept = (get_int_value(player->x) / tile_size) * tile_size;
-	yintercept = player->y + (xintercept - player->x) * tan(ray->ray_angle);
+	xintercept = (int)((player->x) / tile_size) * tile_size;
+	if (ray->is_go_left == 0)
+		xintercept += tile_size;
+	yintercept = (player->y + ((double)xintercept - player->x) * tan(ray->ray_angle));
 	xstep = tile_size;
 	if (ray->is_go_left)
 	{
 		xstep *= -1;
 		xintercept -= 1;
 	}
-	else
-		xintercept += tile_size;
 	ystep = tile_size * tan(ray->ray_angle);
-	if ((ray->is_go_down && ystep < 0) || (!ray->is_go_down && ystep > 0))
+	if ((!ray->is_go_down && ystep > 0) || (ray->is_go_down && ystep < 0))
 		ystep *= -1;
 	while (is_in_the_grid(yintercept, xintercept))
 	{
 		if (grid[yintercept / tile_size][xintercept / tile_size] == 1)
 		{
-			my_mlx_pixel_put(vars.img, xintercept, yintercept, 0x00FF0000);
+			my_mlx_pixel_put(vars->img, xintercept, yintercept, 0x00FF0000);
 			return (1);
 		}
 		yintercept += ystep;
@@ -281,11 +281,11 @@ int		check_vertical_hit(t_ray *ray, t_player *player, t_vars vars)
 
 int		is_wall(t_ray *ray, t_player *player, t_vars *vars)
 {
-	int horizontal_hit;
-	int	vertical_hit;
+	double horizontal_hit;
+	double vertical_hit;
 
-	horizontal_hit = check_horizontal_hit(ray, player, vars);
-	//vertical_hit = check_vertical_hit(ray, player, vars);
+	//horizontal_hit = check_horizontal_hit(ray, player, vars);
+	vertical_hit = check_vertical_hit(ray, player, vars);
 	//if (horizontal_hit > vertical_hit)
 	//	return (horizontal_hit);
 	//return (vertical_hit);
@@ -307,7 +307,7 @@ t_ray	*ray_init(double ray_angle)
 	ray->is_go_left = 0;
 	if (ray->ray_angle > 0 && ray->ray_angle < M_PI)
 		ray->is_go_down = 1;
-	if (ray->ray_angle < (3 * M_PI) / 2 && ray->ray_angle > M_PI / 2)
+	if (ray->ray_angle > (0.5 * M_PI) && ray->ray_angle < 1.5 * M_PI)
 		ray->is_go_left = 1;
 	return (ray);
 }
@@ -327,7 +327,7 @@ int		draw_rays(t_vars *vars, t_data *img)
 		vars->rays[i] = *ray;
 		is_wall(ray, vars->player, vars);
 		ray_angle += fov_angle / num_rays;
-		free(ray);
+		//free(ray);
 	}
 	my_mlx_pixel_put(img, vars->player->x + cos(ray_angle) * ray->distance, vars->player->y + sin(ray_angle) * ray->distance, 0x00FF0000);
 	return (1);
@@ -341,47 +341,16 @@ void		draw_map(t_vars *vars, t_data *img)
 	mlx_put_image_to_window(vars->mlx, vars->win, img->img, 0, 0);
 }
 
-int		key_hook(int keycode, t_vars *vars)
-{
-	if (keycode == 126)
-		vars->player->walk_direction = 1;
-	else if (keycode == 125)
-		vars->player->walk_direction = -1;
-	else if (keycode == 123)
-		vars->player->turn_direction = -1;
-	else if (keycode == 124)
-		vars->player->turn_direction = 1;
-	else if (keycode == 53)
-	{
-		free(vars->player);
-		mlx_destroy_window( vars->mlx, vars->win);
-		exit(0);
-	}
-	return (1);
-}
-
-int		key_release_hook(int keycode, t_vars *vars)
-{
-	if (keycode == 126)
-		vars->player->walk_direction = 0;
-	else if (keycode == 125)
-		vars->player->walk_direction = 0;
-	else if (keycode == 123)
-		vars->player->turn_direction = 0;
-	else if (keycode == 124)
-		vars->player->turn_direction = 0;
-	return (1);
-}
 /*
 int		key_hook(int keycode, t_vars *vars)
 {
-	if (keycode == 13)
+	if (keycode == 126)
 		vars->player->walk_direction = 1;
-	else if (keycode == 1)
+	else if (keycode == 125)
 		vars->player->walk_direction = -1;
-	else if (keycode == 2)
+	else if (keycode == 123)
 		vars->player->turn_direction = -1;
-	else if (keycode == 0)
+	else if (keycode == 124)
 		vars->player->turn_direction = 1;
 	else if (keycode == 53)
 	{
@@ -394,17 +363,49 @@ int		key_hook(int keycode, t_vars *vars)
 
 int		key_release_hook(int keycode, t_vars *vars)
 {
-	if (keycode == 13)
+	if (keycode == 126)
 		vars->player->walk_direction = 0;
-	else if (keycode == 1)
+	else if (keycode == 125)
 		vars->player->walk_direction = 0;
-	else if (keycode == 2)
+	else if (keycode == 123)
 		vars->player->turn_direction = 0;
-	else if (keycode == 0)
+	else if (keycode == 124)
 		vars->player->turn_direction = 0;
 	return (1);
 }
 */
+int		key_hook(int keycode, t_vars *vars)
+{
+	if (keycode == 13)
+		vars->player->walk_direction = 1;
+	else if (keycode == 1)
+		vars->player->walk_direction = -1;
+	else if (keycode == 2)
+		vars->player->turn_direction = -1;
+	else if (keycode == 0)
+		vars->player->turn_direction = 1;
+	else if (keycode == 53)
+	{
+		free(vars->player);
+		mlx_destroy_window( vars->mlx, vars->win);
+		exit(0);
+	}
+	return (1);
+}
+
+int		key_release_hook(int keycode, t_vars *vars)
+{
+	if (keycode == 13)
+		vars->player->walk_direction = 0;
+	else if (keycode == 1)
+		vars->player->walk_direction = 0;
+	else if (keycode == 2)
+		vars->player->turn_direction = 0;
+	else if (keycode == 0)
+		vars->player->turn_direction = 0;
+	return (1);
+}
+
 int		check_collisions(int movestep, t_player *player)
 {
 	int		next_x;
