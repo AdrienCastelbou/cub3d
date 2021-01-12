@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/12 16:21:53 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/12 16:31:58 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,16 @@
 #include <string.h>
 #include "minilibx_opengl_20191021/mlx.h"
 #define INT_MAX 2147483647
-const int	tile_size = 64;
-const int map_rows = 11;
-const int map_cols = 15;
-const int win_rows = map_rows * tile_size;
-const int win_cols = map_cols * tile_size;
-const double fov_angle = 120 * (M_PI / 180);
-const int wall_strip_width = 1;
-const int num_rays = win_cols / wall_strip_width;
-const double minimap_scale = 0.2;
-const	int grid[map_rows][map_cols] = {
+const int		tile_size = 64;
+const int		map_rows = 11;
+const int		map_cols = 15;
+const int		win_width = map_rows * tile_size;
+const int		win_height = map_cols * tile_size;
+const double	fov_angle = 120 * (M_PI / 180);
+const int		wall_strip_width = 1;
+const int		num_rays = win_height / wall_strip_width;
+const double	minimap_scale = 0.2;
+const int		grid[map_rows][map_cols] = {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
 		{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
@@ -43,9 +43,9 @@ const	int grid[map_rows][map_cols] = {
 
 typedef struct	s_ray {
 	double		ray_angle;
-	double			distance;
-	int		wall_hitX;
-	int		wall_hitY;
+	double		distance;
+	int			wall_hitX;
+	int			wall_hitY;
 	int			is_go_down;
 	int			is_go_left;
 }				t_ray;
@@ -89,8 +89,8 @@ void		my_mlx_pixel_put(t_data *data, int x, int y, int color)
 
 void		put_tile(double TileX, double TileY, int Wall, t_data *img)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	i = 0;
 	j = 0;
@@ -100,7 +100,7 @@ void		put_tile(double TileX, double TileY, int Wall, t_data *img)
 		j = 0;
 		while (j < tile_size)
 		{
-			if (!Wall /*&& ((i != 0 && i != tile_size -1) && (j != 0 && j != tile_size - 1))*/)
+			if (!Wall)
 				my_mlx_pixel_put(img, TileX + i, TileY + j, 0x002B0F89);
 			else
 				my_mlx_pixel_put(img, TileX + i, TileY + j, 0x00000000);
@@ -112,10 +112,10 @@ void		put_tile(double TileX, double TileY, int Wall, t_data *img)
 
 void		draw_grid(t_vars vars, t_data *img)
 {
-	int i;
-	int j;
-	int TileX;
-	int TileY;
+	int	i;
+	int	j;
+	int	TileX;
+	int	TileY;
 
 	TileX = 0;
 	TileY = 0;
@@ -136,12 +136,12 @@ void		draw_grid(t_vars vars, t_data *img)
 
 t_player	*player_init(void)
 {
-	t_player *player;
+	t_player	*player;
 
 	if (!(player = malloc(sizeof(t_player))))
 		return (NULL);
-	player->x = win_cols / 2;
-	player->y = win_rows / 2;
+	player->x = win_height / 2;
+	player->y = win_width / 2;
 	player->radius = 3;
 	player->turn_direction = 0;
 	player->walk_direction = 0;
@@ -154,10 +154,10 @@ t_player	*player_init(void)
 
 void		draw_player(t_vars vars, t_data *img)
 {
-	int x;
-	int y;
-	int height;
-	t_player *player;
+	int			x;
+	int			y;
+	int			height;
+	t_player	*player;
 
 	player = vars.player;
 	x = -player->radius;
@@ -175,12 +175,12 @@ void		draw_player(t_vars vars, t_data *img)
 	my_mlx_pixel_put(img, minimap_scale * (player->x + cos(player->rotation_angle) * 10), minimap_scale * (player->y + sin(player->rotation_angle) * 10), 0x00FFFF00);
 }
 
-double ft_dmod(double x, double y)
+double		ft_dmod(double x, double y)
 {
 	return (x - (int)(x/y) * y);
 }
 
-double	ft_abs_angle(double ray_angle)
+double		ft_abs_angle(double ray_angle)
 {
 	ray_angle = ft_dmod(ray_angle, (2 * M_PI));
 	if (ray_angle < 0)
@@ -188,9 +188,9 @@ double	ft_abs_angle(double ray_angle)
 	return (ray_angle);
 }
 
-int		get_int_value(double nb)
+int			get_int_value(double nb)
 {
-	double residue;
+	double	residue;
 
 	residue = nb - (int)nb;
 	if (residue <= 0.5)
@@ -198,7 +198,7 @@ int		get_int_value(double nb)
 	return (floor(nb) + 1);
 }
 
-int		is_in_the_grid(yintercept, xintercept)
+int			is_in_the_grid(yintercept, xintercept)
 {
 	if (yintercept / tile_size > map_rows - 1 || yintercept < 0)
 		return (0);
@@ -253,7 +253,7 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 	int		xstep;
 	int		xintercept;
 	double	yintercept;
-	double distance;
+	double	distance;
 
 	xintercept = floor((player->x) / tile_size) * tile_size;
 	if (ray->is_go_left == 0)
@@ -286,10 +286,10 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 	return (INT_MAX);
 }
 
-void	get_wall_position(t_ray *ray, t_player *player, t_vars *vars)
+void		get_wall_position(t_ray *ray, t_player *player, t_vars *vars)
 {
-	double horizontal_hit;
-	double vertical_hit;
+	double	horizontal_hit;
+	double	vertical_hit;
 
 	horizontal_hit = check_horizontal_hit(ray, player, vars);
 	ray->distance = horizontal_hit;
@@ -300,7 +300,7 @@ void	get_wall_position(t_ray *ray, t_player *player, t_vars *vars)
 		ray->distance = vertical_hit;
 }
 
-t_ray	*ray_init(double ray_angle, t_ray *ray)
+t_ray		*ray_init(double ray_angle, t_ray *ray)
 {
 	ray->ray_angle = ft_abs_angle(ray_angle);;
 	ray->distance = 10;
@@ -318,7 +318,7 @@ t_ray	*ray_init(double ray_angle, t_ray *ray)
 void		draw_rays(t_vars *vars, t_data *img)
 {
 	int		i;
-	t_ray *ray;
+	t_ray	*ray;
 
 	i = -1;
 	while (++i < num_rays)
@@ -347,8 +347,8 @@ void		raycast(t_vars *vars)
 
 void		draw_wall(t_data *img, int x, int y, int width, int height)
 {
-	int i;
-	int j;
+	int		i;
+	int		j;
 
 	i = -1;
 	while (++i < height)
@@ -361,27 +361,27 @@ void		draw_wall(t_data *img, int x, int y, int width, int height)
 
 void		draw_3D_map(t_vars *vars, t_data *img)
 {
-	int i;
-	t_ray *ray;
-	double ray_distance;
-	double proj_plane_dist;
-	double wall_height;
+	int		i;
+	t_ray	*ray;
+	double	ray_distance;
+	double	proj_plane_dist;
+	double	wall_height;
 
 	i = -1;
 	while (++i < num_rays)
 	{
 		ray =  &(vars->rays[i]);
 		ray_distance = ray->distance;
-		proj_plane_dist = (win_cols / 2) / tan(fov_angle / 2);
+		proj_plane_dist = (win_height / 2) / tan(fov_angle / 2);
 		wall_height = (tile_size / ray_distance) * proj_plane_dist;
-		draw_wall(img, i * wall_strip_width, (win_rows / 2) - (wall_height / 2), wall_strip_width, wall_height);
+		draw_wall(img, i * wall_strip_width, (win_width / 2) - (wall_height / 2), wall_strip_width, wall_height);
 	}
 }
 
 void		draw_map(t_vars *vars, t_data *img)
 {
 	mlx_destroy_image(vars->mlx, vars->img->img);
-	img->img = mlx_new_image(vars->mlx, win_cols, win_rows);
+	img->img = mlx_new_image(vars->mlx, win_height, win_width);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel, &img->line_length,
 			&img->endian);
 	raycast(vars);
@@ -425,7 +425,7 @@ int		key_release_hook(int keycode, t_vars *vars)
 	return (1);
 }
 */
-int		key_hook(int keycode, t_vars *vars)
+int			key_hook(int keycode, t_vars *vars)
 {
 	if (keycode == 13)
 		vars->player->walk_direction = 1;
@@ -445,7 +445,7 @@ int		key_hook(int keycode, t_vars *vars)
 	return (1);
 }
 
-int		key_release_hook(int keycode, t_vars *vars)
+int			key_release_hook(int keycode, t_vars *vars)
 {
 	if (keycode == 13)
 		vars->player->walk_direction = 0;
@@ -458,7 +458,7 @@ int		key_release_hook(int keycode, t_vars *vars)
 	return (1);
 }
 
-int		check_collisions(int movestep, t_player *player)
+int			check_collisions(int movestep, t_player *player)
 {
 	int		next_x;
 	int		next_y;
@@ -473,7 +473,7 @@ int		check_collisions(int movestep, t_player *player)
 
 
 
-int		render_next_frame(t_vars *vars)
+int			render_next_frame(t_vars *vars)
 {
 	int movestep;
 
@@ -495,10 +495,10 @@ int			main(void)
     t_data  img;
 
 	vars.mlx = mlx_init();
-	vars.win = mlx_new_window(vars.mlx, win_cols, win_rows, "Hello world!");
+	vars.win = mlx_new_window(vars.mlx, win_height, win_width, "Hello world!");
 	vars.player = player_init();
 	vars.img = &img;
-	img.img = mlx_new_image(vars.mlx, win_cols, win_rows);
+	img.img = mlx_new_image(vars.mlx, win_height, win_width);
     img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
           &img.endian);
 	draw_map(&vars, &img);
