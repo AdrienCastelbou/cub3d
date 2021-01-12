@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/12 14:18:10 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/12 16:21:53 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,7 +286,7 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 	return (INT_MAX);
 }
 
-void	raycast(t_ray *ray, t_player *player, t_vars *vars)
+void	get_wall_position(t_ray *ray, t_player *player, t_vars *vars)
 {
 	double horizontal_hit;
 	double vertical_hit;
@@ -301,11 +301,7 @@ void	raycast(t_ray *ray, t_player *player, t_vars *vars)
 }
 
 t_ray	*ray_init(double ray_angle, t_ray *ray)
-{/*
-	t_ray *ray;
-
-	if (!(ray = malloc(sizeof(t_ray))))
-		return (NULL);*/
+{
 	ray->ray_angle = ft_abs_angle(ray_angle);;
 	ray->distance = 10;
 	ray->wall_hitX = -1;
@@ -319,7 +315,20 @@ t_ray	*ray_init(double ray_angle, t_ray *ray)
 	return (ray);
 }
 
-int		draw_rays(t_vars *vars, t_data *img)
+void		draw_rays(t_vars *vars, t_data *img)
+{
+	int		i;
+	t_ray *ray;
+
+	i = -1;
+	while (++i < num_rays)
+	{
+		ray = &(vars->rays[i]);
+		my_mlx_pixel_put(img, minimap_scale * ray->wall_hitX, minimap_scale * ray->wall_hitY, 0x00FF0000);
+	}
+}
+
+void		raycast(t_vars *vars)
 {
 	t_ray	*ray;
 	double	ray_angle;
@@ -331,11 +340,42 @@ int		draw_rays(t_vars *vars, t_data *img)
 	{
 		ray_init(ray_angle, &(vars->rays[i]));
 		ray =  &(vars->rays[i]);
-		raycast(ray, vars->player, vars);
-		my_mlx_pixel_put(img, minimap_scale * ray->wall_hitX, minimap_scale * ray->wall_hitY, 0x00FF0000);
+		get_wall_position(ray, vars->player, vars);
 		ray_angle += fov_angle / (double)num_rays;
 	}
-	return (1);
+}
+
+void		draw_wall(t_data *img, int x, int y, int width, int height)
+{
+	int i;
+	int j;
+
+	i = -1;
+	while (++i < height)
+	{
+		j = -1;
+		while (++j < width)
+			my_mlx_pixel_put(img, x + j, y + i, 0x00FFFFFF);
+	}
+}
+
+void		draw_3D_map(t_vars *vars, t_data *img)
+{
+	int i;
+	t_ray *ray;
+	double ray_distance;
+	double proj_plane_dist;
+	double wall_height;
+
+	i = -1;
+	while (++i < num_rays)
+	{
+		ray =  &(vars->rays[i]);
+		ray_distance = ray->distance;
+		proj_plane_dist = (win_cols / 2) / tan(fov_angle / 2);
+		wall_height = (tile_size / ray_distance) * proj_plane_dist;
+		draw_wall(img, i * wall_strip_width, (win_rows / 2) - (wall_height / 2), wall_strip_width, wall_height);
+	}
 }
 
 void		draw_map(t_vars *vars, t_data *img)
@@ -344,6 +384,8 @@ void		draw_map(t_vars *vars, t_data *img)
 	img->img = mlx_new_image(vars->mlx, win_cols, win_rows);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel, &img->line_length,
 			&img->endian);
+	raycast(vars);
+	draw_3D_map(vars, img);
 	draw_grid(*vars, img);
 	draw_player(*vars, img);
 	draw_rays(vars, img);
@@ -389,9 +431,9 @@ int		key_hook(int keycode, t_vars *vars)
 		vars->player->walk_direction = 1;
 	else if (keycode == 1)
 		vars->player->walk_direction = -1;
-	else if (keycode == 2)
-		vars->player->turn_direction = -1;
 	else if (keycode == 0)
+		vars->player->turn_direction = -1;
+	else if (keycode == 2)
 		vars->player->turn_direction = 1;
 	else if (keycode == 53)
 	{
@@ -409,9 +451,9 @@ int		key_release_hook(int keycode, t_vars *vars)
 		vars->player->walk_direction = 0;
 	else if (keycode == 1)
 		vars->player->walk_direction = 0;
-	else if (keycode == 2)
-		vars->player->turn_direction = 0;
 	else if (keycode == 0)
+		vars->player->turn_direction = 0;
+	else if (keycode == 2)
 		vars->player->turn_direction = 0;
 	return (1);
 }
