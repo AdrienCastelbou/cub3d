@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/11 17:03:33 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/12 10:44:50 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <string.h>
 #include "minilibx_opengl_20191021/mlx.h"
 #define INT_MAX 2147483647
-const int	tile_size = 32;
+const int	tile_size = 64;
 const int map_rows = 11;
 const int map_cols = 15;
 const int win_rows = map_rows * tile_size;
@@ -99,8 +99,8 @@ void		put_tile(int TileX, int TileY, int Wall, t_data *img)
 		j = 0;
 		while (j < tile_size)
 		{
-			if (!Wall && ((i != 0 && i != tile_size -1) && (j != 0 && j != tile_size - 1)))
-				my_mlx_pixel_put(img, TileX + i, TileY + j, 0x00FFFFFF);
+			if (!Wall /*&& ((i != 0 && i != tile_size -1) && (j != 0 && j != tile_size - 1))*/)
+				my_mlx_pixel_put(img, TileX + i, TileY + j, 0x002B0F89);
 			else
 				my_mlx_pixel_put(img, TileX + i, TileY + j, 0x00000000);
 			j++;
@@ -146,7 +146,7 @@ t_player	*player_init(void)
 	player->walk_direction = 0;
 	player->rotation_angle = M_PI_2;
 	player->move_speed = 3.0;
-	player->rotation_speed = 0.5 * (M_PI / 180);
+	player->rotation_speed = 2 * (M_PI / 180);
 	return (player);
 }
 
@@ -187,11 +187,21 @@ double	ft_abs_angle(double ray_angle)
 	return (ray_angle);
 }
 
+int		get_int_value(double nb)
+{
+	double residue;
+
+	residue = nb - (int)nb;
+	if (residue <= 0.5)
+		return (floor(nb));
+	return (floor(nb) + 1);
+}
+
 int		is_in_the_grid(yintercept, xintercept)
 {
-	if (yintercept / 32 > map_rows - 1 || yintercept < 0)
+	if (yintercept / tile_size > map_rows - 1 || yintercept < 0)
 		return (0);
-	if (xintercept / 32 > map_cols - 1 || xintercept < 0)
+	if (xintercept / tile_size > map_cols - 1 || xintercept < 0)
 		return (0);
 	return (1);
 }
@@ -204,12 +214,12 @@ double		get_distance(double x1, double y1, double x2, double y2)
 double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 {
 	int		ystep;
-	int		xstep;
-	int		xintercept;
+	double	xstep;
+	double	xintercept;
 	int		yintercept;
 	double	distance;
 
-	yintercept = (int)((player->y) / tile_size) * tile_size;
+	yintercept = floor((player->y) / tile_size) * tile_size;
 	if (ray->is_go_down == 1)
 		yintercept += tile_size;
 	xintercept = (player->x + ((double)yintercept - player->y) / tan(ray->ray_angle));
@@ -219,12 +229,13 @@ double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 		ystep *= -1;
 		yintercept -= 1;
 	}
-	xstep = tile_size / tan(ray->ray_angle);
+	xstep = (double)tile_size / tan(ray->ray_angle);
 	if ((ray->is_go_left && xstep > 0) || (!ray->is_go_left && xstep < 0))
 		xstep *= -1;
 	while (is_in_the_grid(yintercept, xintercept))
 	{
-		if (grid[yintercept / tile_size][xintercept / tile_size] == 1)
+		//my_mlx_pixel_put(vars->img, xintercept, yintercept, 0x0012A021);
+		if (grid[yintercept / tile_size][(int)xintercept / tile_size] == 1)
 		{
 			ray->wall_hitX = xintercept;
 			ray->wall_hitY = yintercept;
@@ -238,13 +249,13 @@ double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 
 double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 {
-	int		ystep;
+	double	ystep;
 	int		xstep;
 	int		xintercept;
-	int		yintercept;
+	double	yintercept;
 	double distance;
 
-	xintercept = (int)((player->x) / tile_size) * tile_size;
+	xintercept = floor((player->x) / tile_size) * tile_size;
 	if (ray->is_go_left == 0)
 		xintercept += tile_size;
 	yintercept = (player->y + ((double)xintercept - player->x) * tan(ray->ray_angle));
@@ -259,7 +270,8 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 		ystep *= -1;
 	while (is_in_the_grid(yintercept, xintercept))
 	{
-		if (grid[yintercept / tile_size][xintercept / tile_size] == 1)
+		//my_mlx_pixel_put(vars->img, xintercept, yintercept, 0x0012A021);
+		if (grid[(int)yintercept / tile_size][xintercept / tile_size] == 1)
 		{
 			distance = get_distance(player->x, player->y, xintercept, yintercept);
 			if (distance < ray->distance)
