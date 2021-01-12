@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/12 10:44:50 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/12 14:18:10 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,10 @@ const int map_rows = 11;
 const int map_cols = 15;
 const int win_rows = map_rows * tile_size;
 const int win_cols = map_cols * tile_size;
-const double fov_angle = 60 * (M_PI / 180);
+const double fov_angle = 120 * (M_PI / 180);
 const int wall_strip_width = 1;
 const int num_rays = win_cols / wall_strip_width;
+const double minimap_scale = 0.2;
 const	int grid[map_rows][map_cols] = {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
@@ -86,7 +87,7 @@ void		my_mlx_pixel_put(t_data *data, int x, int y, int color)
 	*(unsigned int*)dst = color;
 }
 
-void		put_tile(int TileX, int TileY, int Wall, t_data *img)
+void		put_tile(double TileX, double TileY, int Wall, t_data *img)
 {
 	int i;
 	int j;
@@ -126,7 +127,7 @@ void		draw_grid(t_vars vars, t_data *img)
 		{
 			TileX = j * tile_size;
 			TileY = i * tile_size;
-			put_tile(TileX, TileY, grid[i][j], img);
+			put_tile(TileX * minimap_scale, TileY * minimap_scale, grid[i][j], img);
 			j++;
 		}
 		i++;
@@ -166,12 +167,12 @@ void		draw_player(t_vars vars, t_data *img)
 		y = -height;
 		while (y < height)
 		{
-			my_mlx_pixel_put(img, player->x + x, player->y + y, 0x00FF0000);
+			my_mlx_pixel_put(img, minimap_scale * (player->x + x), minimap_scale * (player->y + y), 0x00FF0000);
 			y++;
 		}
 		x++;
 	}
-	my_mlx_pixel_put(img, player->x + cos(player->rotation_angle) * 10, player->y + sin(player->rotation_angle) * 10, 0x00FFFF00);
+	my_mlx_pixel_put(img, minimap_scale * (player->x + cos(player->rotation_angle) * 10), minimap_scale * (player->y + sin(player->rotation_angle) * 10), 0x00FFFF00);
 }
 
 double ft_dmod(double x, double y)
@@ -234,7 +235,6 @@ double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 		xstep *= -1;
 	while (is_in_the_grid(yintercept, xintercept))
 	{
-		//my_mlx_pixel_put(vars->img, xintercept, yintercept, 0x0012A021);
 		if (grid[yintercept / tile_size][(int)xintercept / tile_size] == 1)
 		{
 			ray->wall_hitX = xintercept;
@@ -270,7 +270,6 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 		ystep *= -1;
 	while (is_in_the_grid(yintercept, xintercept))
 	{
-		//my_mlx_pixel_put(vars->img, xintercept, yintercept, 0x0012A021);
 		if (grid[(int)yintercept / tile_size][xintercept / tile_size] == 1)
 		{
 			distance = get_distance(player->x, player->y, xintercept, yintercept);
@@ -287,7 +286,7 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 	return (INT_MAX);
 }
 
-void	is_wall(t_ray *ray, t_player *player, t_vars *vars)
+void	raycast(t_ray *ray, t_player *player, t_vars *vars)
 {
 	double horizontal_hit;
 	double vertical_hit;
@@ -301,12 +300,12 @@ void	is_wall(t_ray *ray, t_player *player, t_vars *vars)
 		ray->distance = vertical_hit;
 }
 
-t_ray	*ray_init(double ray_angle)
-{
+t_ray	*ray_init(double ray_angle, t_ray *ray)
+{/*
 	t_ray *ray;
 
 	if (!(ray = malloc(sizeof(t_ray))))
-		return (NULL);
+		return (NULL);*/
 	ray->ray_angle = ft_abs_angle(ray_angle);;
 	ray->distance = 10;
 	ray->wall_hitX = -1;
@@ -330,18 +329,21 @@ int		draw_rays(t_vars *vars, t_data *img)
 	ray_angle = vars->player->rotation_angle - (fov_angle / 2);
 	while (++i < num_rays)
 	{
-		ray = ray_init(ray_angle);
-		vars->rays[i] = *ray;
-		is_wall(ray, vars->player, vars);
-		my_mlx_pixel_put(img, ray->wall_hitX, ray->wall_hitY, 0x00FF0000);
-		ray_angle += fov_angle / num_rays;
-		//free(ray);
+		ray_init(ray_angle, &(vars->rays[i]));
+		ray =  &(vars->rays[i]);
+		raycast(ray, vars->player, vars);
+		my_mlx_pixel_put(img, minimap_scale * ray->wall_hitX, minimap_scale * ray->wall_hitY, 0x00FF0000);
+		ray_angle += fov_angle / (double)num_rays;
 	}
 	return (1);
 }
 
 void		draw_map(t_vars *vars, t_data *img)
 {
+	mlx_destroy_image(vars->mlx, vars->img->img);
+	img->img = mlx_new_image(vars->mlx, win_cols, win_rows);
+	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel, &img->line_length,
+			&img->endian);
 	draw_grid(*vars, img);
 	draw_player(*vars, img);
 	draw_rays(vars, img);
@@ -394,6 +396,7 @@ int		key_hook(int keycode, t_vars *vars)
 	else if (keycode == 53)
 	{
 		free(vars->player);
+		mlx_destroy_image(vars->mlx, vars->img->img);
 		mlx_destroy_window( vars->mlx, vars->win);
 		exit(0);
 	}
