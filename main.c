@@ -6,78 +6,12 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/13 10:31:42 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/13 11:33:54 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include "minilibx_opengl_20191021/mlx.h"
-#define INT_MAX 2147483647
-const int		tile_size = 64;
-const int		map_rows = 11;
-const int		map_cols = 15;
-const int		win_width = map_rows * tile_size;
-const int		win_height = map_cols * tile_size;
-const double	fov_angle = 120 * (M_PI / 180);
-const int		wall_strip_width = 1;
-const int		num_rays = win_height / wall_strip_width;
-const double	minimap_scale = 0.2;
-const int		grid[map_rows][map_cols] = {
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-		{1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	};
-
-typedef struct	s_ray {
-	double		ray_angle;
-	double		distance;
-	int			wall_hitX;
-	int			wall_hitY;
-	int			is_go_down;
-	int			is_go_left;
-}				t_ray;
-
-
-typedef struct	s_player {
-	double		x;
-	double		y;
-	int			radius;
-	int			turn_direction;
-	int			walk_direction;
-	double		rotation_angle;
-	int			move_speed;
-	double		rotation_speed;
-}				t_player;
-
-typedef struct	s_data {
-	void		*img;
-	char		*addr;
-	int			bits_per_pixel;
-	int			line_length;
-	int			endian;
-}				t_data;
-
-typedef struct	s_vars {
-    void		*mlx;
-    void		*win;
-	t_player	*player;
-	t_data		*img;
-	t_ray		rays[num_rays];
-}				t_vars;
-
+#include "cub3d.h"
 
 void		my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
@@ -198,7 +132,7 @@ int			get_int_value(double nb)
 	return (floor(nb) + 1);
 }
 
-int			is_in_the_grid(yintercept, xintercept)
+int			is_in_the_grid(double yintercept, double xintercept)
 {
 	if (yintercept / tile_size > map_rows - 1 || yintercept < 0)
 		return (0);
