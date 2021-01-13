@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/12 16:31:58 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/13 10:31:42 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,12 +95,12 @@ void		put_tile(double TileX, double TileY, int Wall, t_data *img)
 	i = 0;
 	j = 0;
 
-	while (i < tile_size)
+	while (i < tile_size * minimap_scale)
 	{
 		j = 0;
-		while (j < tile_size)
+		while (j < tile_size * minimap_scale)
 		{
-			if (!Wall)
+			if (Wall)
 				my_mlx_pixel_put(img, TileX + i, TileY + j, 0x002B0F89);
 			else
 				my_mlx_pixel_put(img, TileX + i, TileY + j, 0x00000000);
@@ -127,7 +127,7 @@ void		draw_grid(t_vars vars, t_data *img)
 		{
 			TileX = j * tile_size;
 			TileY = i * tile_size;
-			put_tile(TileX * minimap_scale, TileY * minimap_scale, grid[i][j], img);
+			put_tile(TileX  * minimap_scale, TileY * minimap_scale, grid[i][j], img);
 			j++;
 		}
 		i++;
@@ -392,7 +392,7 @@ void		draw_map(t_vars *vars, t_data *img)
 	mlx_put_image_to_window(vars->mlx, vars->win, img->img, 0, 0);
 }
 
-/*
+
 int		key_hook(int keycode, t_vars *vars)
 {
 	if (keycode == 126)
@@ -424,7 +424,7 @@ int		key_release_hook(int keycode, t_vars *vars)
 		vars->player->turn_direction = 0;
 	return (1);
 }
-*/
+/*
 int			key_hook(int keycode, t_vars *vars)
 {
 	if (keycode == 13)
@@ -457,7 +457,7 @@ int			key_release_hook(int keycode, t_vars *vars)
 		vars->player->turn_direction = 0;
 	return (1);
 }
-
+*/
 int			check_collisions(int movestep, t_player *player)
 {
 	int		next_x;
