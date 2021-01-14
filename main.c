@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/14 15:29:49 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/14 17:25:53 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ t_player	*player_init(void)
 	if (!(player = malloc(sizeof(t_player))))
 		return (NULL);
 	player->x = win_width / 2;
-	player->y = win_height / 2;
+	player->y = win_height / 7;
 	player->radius = 3;
 	player->turn_direction = 0;
 	player->walk_direction = 0;
@@ -302,14 +302,16 @@ void		draw_3D_map(t_vars *vars, t_data *img)
 	double	ray_distance;
 	double	proj_plane_dist;
 	double	wall_height;
+	double	correct;
 
 	i = -1;
 	while (++i < num_rays)
 	{
 		ray =  &(vars->rays[i]);
 		ray_distance = ray->distance;
+		correct = ray_distance * cos(ray->ray_angle - vars->player->rotation_angle);
 		proj_plane_dist = (win_width / 2) / tan(fov_angle / 2);
-		wall_height = (tile_size / ray_distance) * proj_plane_dist;
+		wall_height = (tile_size / correct) * proj_plane_dist;
 		draw_wall(img, i * wall_strip_width, (win_height / 2) - (wall_height / 2), wall_strip_width, wall_height);
 	}
 }

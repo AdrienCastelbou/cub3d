@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/14 15:28:08 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/14 17:19:00 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ const int		map_rows = 11;
 const int		map_cols = 15;
 const int		win_height = map_rows * tile_size;
 const int		win_width = map_cols * tile_size;
-const double	fov_angle = 120 * (M_PI / 180);
+const double	fov_angle = 60 * (M_PI / 180);
 const int		wall_strip_width = 1;
 const int		num_rays = win_width / wall_strip_width;
 const double	minimap_scale = 0.2;
