@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/13 11:33:54 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/14 15:29:49 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,8 @@ t_player	*player_init(void)
 
 	if (!(player = malloc(sizeof(t_player))))
 		return (NULL);
-	player->x = win_height / 2;
-	player->y = win_width / 2;
+	player->x = win_width / 2;
+	player->y = win_height / 2;
 	player->radius = 3;
 	player->turn_direction = 0;
 	player->walk_direction = 0;
@@ -285,7 +285,9 @@ void		draw_wall(t_data *img, int x, int y, int width, int height)
 	int		j;
 
 	i = -1;
-	while (++i < height)
+	if (y < 0)
+		y = 0;
+	while (++i < height && y + i < win_height)
 	{
 		j = -1;
 		while (++j < width)
@@ -306,16 +308,16 @@ void		draw_3D_map(t_vars *vars, t_data *img)
 	{
 		ray =  &(vars->rays[i]);
 		ray_distance = ray->distance;
-		proj_plane_dist = (win_height / 2) / tan(fov_angle / 2);
+		proj_plane_dist = (win_width / 2) / tan(fov_angle / 2);
 		wall_height = (tile_size / ray_distance) * proj_plane_dist;
-		draw_wall(img, i * wall_strip_width, (win_width / 2) - (wall_height / 2), wall_strip_width, wall_height);
+		draw_wall(img, i * wall_strip_width, (win_height / 2) - (wall_height / 2), wall_strip_width, wall_height);
 	}
 }
 
 void		draw_map(t_vars *vars, t_data *img)
 {
 	mlx_destroy_image(vars->mlx, vars->img->img);
-	img->img = mlx_new_image(vars->mlx, win_height, win_width);
+	img->img = mlx_new_image(vars->mlx, win_width, win_height);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel, &img->line_length,
 			&img->endian);
 	raycast(vars);
@@ -429,10 +431,10 @@ int			main(void)
     t_data  img;
 
 	vars.mlx = mlx_init();
-	vars.win = mlx_new_window(vars.mlx, win_height, win_width, "Hello world!");
+	vars.win = mlx_new_window(vars.mlx, win_width, win_height, "Hello world!");
 	vars.player = player_init();
 	vars.img = &img;
-	img.img = mlx_new_image(vars.mlx, win_height, win_width);
+	img.img = mlx_new_image(vars.mlx, win_width, win_height);
     img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
           &img.endian);
 	draw_map(&vars, &img);
