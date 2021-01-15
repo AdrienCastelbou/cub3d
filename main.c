@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/14 17:25:53 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/14 22:57:49 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,7 +279,48 @@ void		raycast(t_vars *vars)
 	}
 }
 
-void		draw_wall(t_data *img, int x, int y, int width, int height)
+int		create_trgb(int t, int r, int g, int b)
+{
+	return(t << 24 | r << 16 | g << 8 | b);
+}
+
+int		get_t(int trgb)
+{
+	return (trgb & (0xFF << 24));
+}
+
+int		get_r(int trgb)
+{
+	return (trgb & (0xFF << 16));
+}
+
+int		get_g(int trgb)
+{
+	return (trgb & (0xFF << 8));
+}
+
+int		get_b(int trgb)
+{
+	return (trgb & 0xFF);
+}
+
+int			add_shade(double distance, int	trgb)
+{
+	int t;
+	int r;
+	int g;
+	int b;
+
+	t = get_t(trgb);;
+	r = get_r(trgb);
+	g= get_g(trgb);
+	b = get_b(trgb);
+
+	printf("%x\n", create_trgb(t, r, g, b));
+	return (create_trgb(t, r, g, b));
+}
+
+void		draw_wall(t_data *img, int x, int y, int width, int height, double distance)
 {
 	int		i;
 	int		j;
@@ -291,7 +332,7 @@ void		draw_wall(t_data *img, int x, int y, int width, int height)
 	{
 		j = -1;
 		while (++j < width)
-			my_mlx_pixel_put(img, x + j, y + i, 0x00FFFFFF);
+			my_mlx_pixel_put(img, x + j, y + i,  0x00FFFFFF);
 	}
 }
 
@@ -312,7 +353,7 @@ void		draw_3D_map(t_vars *vars, t_data *img)
 		correct = ray_distance * cos(ray->ray_angle - vars->player->rotation_angle);
 		proj_plane_dist = (win_width / 2) / tan(fov_angle / 2);
 		wall_height = (tile_size / correct) * proj_plane_dist;
-		draw_wall(img, i * wall_strip_width, (win_height / 2) - (wall_height / 2), wall_strip_width, wall_height);
+		draw_wall(img, i * wall_strip_width, (win_height / 2) - (wall_height / 2), wall_strip_width, wall_height, correct);
 	}
 }
 
