@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/15 15:03:39 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/15 15:07:21 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,6 +281,47 @@ void		raycast(t_vars *vars)
 	}
 }
 
+int		create_trgb(int t, int r, int g, int b)
+{
+	return(t << 24 | r << 16 | g << 8 | b);
+}
+
+int		get_t(int trgb)
+{
+	return (trgb & (0xFF << 24));
+}
+
+int		get_r(int trgb)
+{
+	return (trgb & (0xFF << 16));
+}
+
+int		get_g(int trgb)
+{
+	return (trgb & (0xFF << 8));
+}
+
+int		get_b(int trgb)
+{
+	return (trgb & 0xFF);
+}
+
+int			add_shade(double distance, int	trgb)
+{
+	int t;
+	int r;
+	int g;
+	int b;
+
+	t = get_t(trgb);;
+	r = get_r(trgb);
+	g= get_g(trgb);
+	b = get_b(trgb);
+
+	printf("%x\n", create_trgb(t, r, g, b));
+	return (create_trgb(t, r, g, b));
+}
+
 void		draw_wall(t_data *img, int x, int y, int width, int height)
 {
 	int		i;
@@ -293,7 +334,7 @@ void		draw_wall(t_data *img, int x, int y, int width, int height)
 	{
 		j = -1;
 		while (++j < width)
-			my_mlx_pixel_put(img, x + j, y + i, 0x00FFFFFF);
+			my_mlx_pixel_put(img, x + j, y + i,  0x00FFFFFF);
 	}
 }
 
