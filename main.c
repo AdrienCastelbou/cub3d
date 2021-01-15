@@ -6,11 +6,16 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/15 15:07:21 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/15 16:50:25 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include "gnl/get_next_line.h"
+#include "libft/libft.h"
 
 void		my_mlx_pixel_put(t_data *data, int x, int y, int color)
 {
@@ -281,47 +286,6 @@ void		raycast(t_vars *vars)
 	}
 }
 
-int		create_trgb(int t, int r, int g, int b)
-{
-	return(t << 24 | r << 16 | g << 8 | b);
-}
-
-int		get_t(int trgb)
-{
-	return (trgb & (0xFF << 24));
-}
-
-int		get_r(int trgb)
-{
-	return (trgb & (0xFF << 16));
-}
-
-int		get_g(int trgb)
-{
-	return (trgb & (0xFF << 8));
-}
-
-int		get_b(int trgb)
-{
-	return (trgb & 0xFF);
-}
-
-int			add_shade(double distance, int	trgb)
-{
-	int t;
-	int r;
-	int g;
-	int b;
-
-	t = get_t(trgb);;
-	r = get_r(trgb);
-	g= get_g(trgb);
-	b = get_b(trgb);
-
-	printf("%x\n", create_trgb(t, r, g, b));
-	return (create_trgb(t, r, g, b));
-}
-
 void		draw_wall(t_data *img, int x, int y, int width, int height)
 {
 	int		i;
@@ -468,7 +432,7 @@ int			render_next_frame(t_vars *vars)
 	draw_map(vars, (vars->img));
 	return (1);
 }
-
+/*
 int			main(void)
 {
 	t_vars	vars;
@@ -484,4 +448,86 @@ int			main(void)
 	draw_map(&vars, &img);
 	mlx_loop_hook(vars.mlx, render_next_frame, &vars);
 	mlx_loop(vars.mlx);
+}*/
+
+typedef struct	s_infos {
+		int		r[2];
+		char	*no;
+		char	*so;
+		char	*we;
+		char	*ea;
+		char	*s;
+		int		f[3];
+		int		c[3];
+}				t_infos;
+
+void	get_texture(char *line, char **dest)
+{
+	int i;
+	
+	i = 0;
+	while (line[i] && line[i] == ' ')
+		i++;
+	if (line[i])
+		*dest = ft_strdup(line + i);
+}
+
+void	get_digits_infos(char *line, int set[], int len)
+{
+	int	i;
+	int	index;
+
+	i = 0;
+	index = 0;
+	while (line[i] && index < 3)
+	{
+		if ((line[i] >= '0' && line[i] <= '9'))
+		{
+			set[index] = ft_atoi(line + i);
+			index++;
+			while (line[i] && (line[i] >= '0' && line[i] <= '9'))
+				i++;
+		}
+		else
+			i++;
+	}
+}
+
+void	get_infos(t_infos *cub, char *line)
+{
+	if (ft_strnstr(line, "R ", 2) == line)
+		get_digits_infos(line + 2, cub->r, 2);
+	else if (ft_strnstr(line, "NO ", 3) == line)
+		get_texture(line + 3, &cub->no);
+	else if (ft_strnstr(line, "SO ", 3) == line)
+		get_texture(line + 3, &cub->so);
+	else if (ft_strnstr(line, "WE ", 3) == line)
+		get_texture(line + 3, &cub->we);
+	else if (ft_strnstr(line, "EA ", 3) == line)
+		get_texture(line + 3, &cub->ea);
+	else if (ft_strnstr(line, "S ", 2) == line)
+		get_texture(line + 2, &cub->s);
+	else if (ft_strnstr(line, "F ", 2) == line)
+		get_digits_infos(line + 2, cub->f, 3);
+	else if (ft_strnstr(line, "C ", 2) == line)
+		get_digits_infos(line + 2, cub->c, 3);
+}
+
+int		main(int ac, char **av)
+{
+	int		fd;
+	int		ret;
+	char	*line;
+	t_infos	cub;
+
+	fd = open(av[1], O_RDONLY);
+
+	ret = get_next_line(fd, &line);
+	while (ret > 0)
+	{
+		if (*line)
+			get_infos(&cub, line);
+		free(line);
+		ret = get_next_line(fd, &line);
+	}
 }
