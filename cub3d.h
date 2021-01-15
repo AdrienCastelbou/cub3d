@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/14 17:19:00 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/15 14:57:44 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ typedef struct	s_vars {
 }				t_vars;
 
 void			my_mlx_pixel_put(t_data *data, int x, int y, int color);
-void			put_tile(double TileX, double TileY, int Wall, t_data *img);
+void			put_tile(double tile_x, double tile_y, int wall, t_data *img);
 void			draw_grid(t_vars vars, t_data *img);
 t_player		*player_init(void);
 void			draw_player(t_vars vars, t_data *img);
@@ -95,7 +95,7 @@ t_ray			*ray_init(double ray_angle, t_ray *ray);
 void			draw_rays(t_vars *vars, t_data *img);
 void			raycast(t_vars *vars);
 void			draw_wall(t_data *img, int x, int y, int width, int height);
-void			draw_3D_map(t_vars *vars, t_data *img);
+void			draw_3d_map(t_vars *vars, t_data *img);
 void			draw_map(t_vars *vars, t_data *img);
 int				key_hook(int keycode, t_vars *vars);
 int				key_release_hook(int keycode, t_vars *vars);
