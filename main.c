@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/15 16:50:25 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/16 20:06:13 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -452,34 +452,43 @@ int			main(void)
 
 typedef struct	s_infos {
 		int		r[2];
-		char	*no;
-		char	*so;
-		char	*we;
-		char	*ea;
-		char	*s;
+		t_data	*no;
+		t_data	*so;
+		t_data	*we;
+		t_data	*ea;
+		t_data	*s;
 		int		f[3];
 		int		c[3];
+		t_vars vars;
 }				t_infos;
 
-void	get_texture(char *line, char **dest)
+
+int		get_texture(char *line, t_data *img, t_infos *cub)
 {
-	int i;
-	
+	int		i;
+	int		size;
+	char	*path;
+
 	i = 0;
+	size = 32;
 	while (line[i] && line[i] == ' ')
 		i++;
-	if (line[i])
-		*dest = ft_strdup(line + i);
+	if (!line[i])
+		return (-1);
+	path = ft_strdup(line + i);
+	if (!(img = mlx_xpm_file_to_image(cub->vars.mlx, path, &size, &size)))
+		return (-2);
+	return (1);
 }
 
-void	get_digits_infos(char *line, int set[], int len)
+int		get_digits_infos(char *line, int set[], int len)
 {
 	int	i;
 	int	index;
 
 	i = 0;
 	index = 0;
-	while (line[i] && index < 3)
+	while (line[i] && index < len)
 	{
 		if ((line[i] >= '0' && line[i] <= '9'))
 		{
@@ -491,26 +500,30 @@ void	get_digits_infos(char *line, int set[], int len)
 		else
 			i++;
 	}
+	if (line[i])
+		return (-1);
+	return (1);
 }
 
-void	get_infos(t_infos *cub, char *line)
+int		get_infos(t_infos *cub, char *line)
 {
 	if (ft_strnstr(line, "R ", 2) == line)
-		get_digits_infos(line + 2, cub->r, 2);
+		return get_digits_infos(line + 2, cub->r, 2);
 	else if (ft_strnstr(line, "NO ", 3) == line)
-		get_texture(line + 3, &cub->no);
+		return get_texture(line + 3, cub->no, cub);
 	else if (ft_strnstr(line, "SO ", 3) == line)
-		get_texture(line + 3, &cub->so);
+		return get_texture(line + 3, cub->so, cub);
 	else if (ft_strnstr(line, "WE ", 3) == line)
-		get_texture(line + 3, &cub->we);
+		return get_texture(line + 3, cub->we, cub);
 	else if (ft_strnstr(line, "EA ", 3) == line)
-		get_texture(line + 3, &cub->ea);
+		return get_texture(line + 3, cub->ea, cub);
 	else if (ft_strnstr(line, "S ", 2) == line)
-		get_texture(line + 2, &cub->s);
+		return get_texture(line + 2, cub->s, cub);
 	else if (ft_strnstr(line, "F ", 2) == line)
-		get_digits_infos(line + 2, cub->f, 3);
+		return get_digits_infos(line + 2, cub->f, 3);
 	else if (ft_strnstr(line, "C ", 2) == line)
-		get_digits_infos(line + 2, cub->c, 3);
+		return get_digits_infos(line + 2, cub->c, 3);
+	return (0);
 }
 
 int		main(int ac, char **av)
@@ -521,12 +534,12 @@ int		main(int ac, char **av)
 	t_infos	cub;
 
 	fd = open(av[1], O_RDONLY);
-
+	cub.vars.mlx = mlx_init();
 	ret = get_next_line(fd, &line);
 	while (ret > 0)
 	{
 		if (*line)
-			get_infos(&cub, line);
+			printf("%d\n", get_infos(&cub, line));
 		free(line);
 		ret = get_next_line(fd, &line);
 	}
