@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/18 13:24:36 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/18 15:42:35 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,10 @@ void		put_tile(double tile_x, double tile_y, int wall, t_data *img)
 
 	i = 0;
 	j = 0;
-	while (i < tile_size * minimap_scale)
+	while (i < tile_size /* minimap_scale*/)
 	{
 		j = 0;
-		while (j < tile_size * minimap_scale)
+		while (j < tile_size /* minimap_scale*/)
 		{
 			if (wall)
 				my_mlx_pixel_put(img, tile_x + i, tile_y + j, 0x002B0F89);
@@ -47,7 +47,7 @@ void		put_tile(double tile_x, double tile_y, int wall, t_data *img)
 	}
 }
 
-void		draw_grid(t_vars vars, t_data *img)
+void		draw_grid(t_infos cub, t_data *img)
 {
 	int	i;
 	int	j;
@@ -57,46 +57,79 @@ void		draw_grid(t_vars vars, t_data *img)
 	tile_x = 0;
 	tile_y = 0;
 	i = 0;
-	while (i < map_rows)
+	while (cub.map[i])
 	{
 		j = 0;
-		while (j < map_cols)
+		while (cub.map[i][j])
 		{
 			tile_x = j * tile_size;
 			tile_y = i * tile_size;
-			put_tile(tile_x * minimap_scale, tile_y * minimap_scale,
-					grid[i][j], img);
+			if (cub.map[i][j] == '1')
+				put_tile(tile_x /* minimap_scale*/, tile_y /* minimap_scale*/,
+					1, img);
+			else
+				put_tile(tile_x /* minimap_scale*/, tile_y /* minimap_scale*/,
+					0, img);
 			j++;
 		}
 		i++;
 	}
 }
 
-t_player	*player_init(void)
+double		get_start_angle(char c)
+{
+	if (c == 'S')
+		return (M_PI_2);
+	else if (c == 'W')
+		return (M_PI);
+	else if (c == 'E')
+		return (0);
+	return ((3 * M_PI) / 2);
+}
+
+void		get_player_infos(t_infos *cub, t_player *player)
+{
+	int		i;
+	int		j;
+	char	c;
+	i = -1;
+	while (cub->map[++i])
+	{
+		j = -1;
+		while (cub->map[i][++j])
+			if (ft_strchr("SNEW", cub->map[i][j]))
+			{
+				player->x = j * tile_size;
+				player->y = i * tile_size;
+				player->rotation_angle = get_start_angle(cub->map[i][j]);
+				cub->map[i][j] = '0';
+			}
+	}
+}
+
+t_player	*player_init(t_infos *cub)
 {
 	t_player	*player;
 
 	if (!(player = malloc(sizeof(t_player))))
 		return (NULL);
-	player->x = win_width / 2;
-	player->y = win_height / 7;
 	player->radius = 3;
 	player->turn_direction = 0;
 	player->walk_direction = 0;
-	player->rotation_angle = M_PI_2;
 	player->move_speed = 3.0;
 	player->rotation_speed = 2 * (M_PI / 180);
+	get_player_infos(cub, player);
 	return (player);
 }
 
-void		draw_player(t_vars vars, t_data *img)
+void		draw_player(t_infos cub, t_data *img)
 {
 	int			x;
 	int			y;
 	int			height;
 	t_player	*player;
 
-	player = vars.player;
+	player = cub.player;
 	x = -player->radius;
 	while (x < player->radius)
 	{
@@ -104,8 +137,8 @@ void		draw_player(t_vars vars, t_data *img)
 		y = -height;
 		while (y < height)
 		{
-			my_mlx_pixel_put(img, minimap_scale * (player->x + x),
-					minimap_scale * (player->y + y), 0x00FF0000);
+			my_mlx_pixel_put(img, /*minimap_scale */ (player->x + x),
+					/*minimap_scale */ (player->y + y), 0x00FF0000);
 			y++;
 		}
 		x++;
@@ -135,11 +168,23 @@ int			get_int_value(double nb)
 	return (floor(nb) + 1);
 }
 
-int			is_in_the_grid(double yintercept, double xintercept)
+int			is_in_the_grid(t_infos *cub, double yintercept, double xintercept)
 {
-	if (yintercept / tile_size > map_rows - 1 || yintercept < 0)
+	int y;
+	int x;
+
+	if (yintercept < 0 || xintercept < 0)
 		return (0);
-	if (xintercept / tile_size > map_cols - 1 || xintercept < 0)
+	x = -1;
+	y = -1;
+	while (cub->map[++y])
+		;
+	if (yintercept / tile_size > y)
+		return (0);
+	y = (int)yintercept / tile_size;
+	while (cub->map[y][++x])
+		;
+	if (xintercept / tile_size > x)
 		return (0);
 	return (1);
 }
@@ -149,7 +194,7 @@ double		get_distance(double x1, double y1, double x2, double y2)
 	return (sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)));
 }
 
-double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
+double		check_horizontal_hit(t_ray *ray, t_player *player, t_infos *cub)
 {
 	int		ystep;
 	double	xstep;
@@ -171,9 +216,9 @@ double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 	xstep = (double)tile_size / tan(ray->ray_angle);
 	if ((ray->is_go_left && xstep > 0) || (!ray->is_go_left && xstep < 0))
 		xstep *= -1;
-	while (is_in_the_grid(yintercept, xintercept))
+	while (is_in_the_grid(cub, yintercept, xintercept))
 	{
-		if (grid[yintercept / tile_size][(int)xintercept / tile_size] == 1)
+		if (cub->map[yintercept / tile_size][(int)xintercept / tile_size] == '1')
 		{
 			ray->wall_hitX = xintercept;
 			ray->wall_hitY = yintercept;
@@ -185,7 +230,7 @@ double		check_horizontal_hit(t_ray *ray, t_player *player, t_vars *vars)
 	return (INT_MAX);
 }
 
-double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
+double		check_vertical_hit(t_ray *ray, t_player *player, t_infos *cub)
 {
 	double	ystep;
 	int		xstep;
@@ -207,9 +252,9 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 	ystep = tile_size * tan(ray->ray_angle);
 	if ((!ray->is_go_down && ystep > 0) || (ray->is_go_down && ystep < 0))
 		ystep *= -1;
-	while (is_in_the_grid(yintercept, xintercept))
+	while (is_in_the_grid(cub, yintercept, xintercept))
 	{
-		if (grid[(int)yintercept / tile_size][xintercept / tile_size] == 1)
+		if (cub->map[(int)yintercept / tile_size][xintercept / tile_size] == '1')
 		{
 			distance = get_distance(player->x, player->y,
 					xintercept, yintercept);
@@ -226,14 +271,14 @@ double		check_vertical_hit(t_ray *ray, t_player *player, t_vars *vars)
 	return (INT_MAX);
 }
 
-void		get_wall_position(t_ray *ray, t_player *player, t_vars *vars)
+void		get_wall_position(t_ray *ray, t_player *player, t_infos *cub)
 {
 	double	horizontal_hit;
 	double	vertical_hit;
 
-	horizontal_hit = check_horizontal_hit(ray, player, vars);
+	horizontal_hit = check_horizontal_hit(ray, player, cub);
 	ray->distance = horizontal_hit;
-	vertical_hit = check_vertical_hit(ray, player, vars);
+	vertical_hit = check_vertical_hit(ray, player, cub);
 	if (horizontal_hit < vertical_hit)
 		ray->distance = horizontal_hit;
 	else
@@ -255,7 +300,7 @@ t_ray		*ray_init(double ray_angle, t_ray *ray)
 	return (ray);
 }
 
-void		draw_rays(t_vars *vars, t_data *img)
+void		draw_rays(t_infos *cub, t_data *img)
 {
 	int		i;
 	t_ray	*ray;
@@ -263,30 +308,30 @@ void		draw_rays(t_vars *vars, t_data *img)
 	i = -1;
 	while (++i < num_rays)
 	{
-		ray = &(vars->rays[i]);
-		my_mlx_pixel_put(img, minimap_scale * ray->wall_hitX, minimap_scale
-				* ray->wall_hitY, 0x00FF0000);
+		ray = &(cub->rays[i]);
+		my_mlx_pixel_put(img, /*minimap_scale */ ray->wall_hitX, /*minimap_scale
+				*/ ray->wall_hitY, 0x00FF0000);
 	}
 }
 
-void		raycast(t_vars *vars)
+void		raycast(t_infos *cub)
 {
 	t_ray	*ray;
 	double	ray_angle;
 	int		i;
 
 	i = -1;
-	ray_angle = vars->player->rotation_angle - (fov_angle / 2);
+	ray_angle = cub->player->rotation_angle - (fov_angle / 2);
 	while (++i < num_rays)
 	{
-		ray_init(ray_angle, &(vars->rays[i]));
-		ray = &(vars->rays[i]);
-		get_wall_position(ray, vars->player, vars);
+		ray_init(ray_angle, &(cub->rays[i]));
+		ray = &(cub->rays[i]);
+		get_wall_position(ray, cub->player, cub);
 		ray_angle += fov_angle / (double)num_rays;
 	}
 }
 
-void		draw_wall(t_data *img, int x, int y, int width, int height)
+void		draw_wall(t_infos *cub, int x, int y, int width, int height)
 {
 	int		i;
 	int		j;
@@ -294,15 +339,15 @@ void		draw_wall(t_data *img, int x, int y, int width, int height)
 	i = -1;
 	if (y < 0)
 		y = 0;
-	while (++i < height && y + i < win_height)
+	while (++i < height && y + i < cub->r[1])
 	{
 		j = -1;
 		while (++j < width)
-			my_mlx_pixel_put(img, x + j, y + i,  0x00FFFFFF);
+			my_mlx_pixel_put(cub->img, x + j, y + i,  0x00FFFFFF);
 	}
 }
 
-void		draw_3d_map(t_vars *vars, t_data *img)
+void		draw_3d_map(t_infos *cub, t_data *img)
 {
 	int		i;
 	t_ray	*ray;
@@ -313,59 +358,59 @@ void		draw_3d_map(t_vars *vars, t_data *img)
 	i = -1;
 	while (++i < num_rays)
 	{
-		ray = &(vars->rays[i]);
+		ray = &(cub->rays[i]);
 		correct = ray->distance * cos(ray->ray_angle -
-				vars->player->rotation_angle);
-		proj_plane_dist = (win_width / 2) / tan(fov_angle / 2);
+				cub->player->rotation_angle);
+		proj_plane_dist = (cub->r[0] / 2) / tan(fov_angle / 2);
 		wall_height = (tile_size / correct) * proj_plane_dist;
-		draw_wall(img, i * wall_strip_width, (win_height / 2) -
+		draw_wall(cub, i * wall_strip_width, (cub->r[1] / 2) -
 				(wall_height / 2), wall_strip_width, wall_height);
 	}
 }
 
-void		draw_map(t_vars *vars, t_data *img)
+void		draw_map(t_infos *cub, t_data *img)
 {
-	mlx_destroy_image(vars->mlx, vars->img->img);
-	img->img = mlx_new_image(vars->mlx, win_width, win_height);
+	mlx_destroy_image(cub->mlx, cub->img->img);
+	img->img = mlx_new_image(cub->mlx, cub->r[0], cub->r[1]);
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
 			&img->line_length, &img->endian);
-	raycast(vars);
-	draw_3d_map(vars, img);
-	draw_grid(*vars, img);
-	draw_player(*vars, img);
-	draw_rays(vars, img);
-	mlx_put_image_to_window(vars->mlx, vars->win, img->img, 0, 0);
+	raycast(cub);
+	//draw_3d_map(cub, img);
+	draw_grid(*cub, img);
+	draw_player(*cub, img);
+	draw_rays(cub, img);
+	mlx_put_image_to_window(cub->mlx, cub->win, img->img, 0, 0);
 }
 
-int			key_hook(int keycode, t_vars *vars)
+int			key_hook(int keycode, t_infos *cub)
 {
 	if (keycode == 126)
-		vars->player->walk_direction = 1;
+		cub->player->walk_direction = 1;
 	else if (keycode == 125)
-		vars->player->walk_direction = -1;
+		cub->player->walk_direction = -1;
 	else if (keycode == 123)
-		vars->player->turn_direction = -1;
+		cub->player->turn_direction = -1;
 	else if (keycode == 124)
-		vars->player->turn_direction = 1;
+		cub->player->turn_direction = 1;
 	else if (keycode == 53)
 	{
-		free(vars->player);
-		mlx_destroy_window(vars->mlx, vars->win);
+		free(cub->player);
+		mlx_destroy_window(cub->mlx, cub->win);
 		exit(0);
 	}
 	return (1);
 }
 
-int			key_release_hook(int keycode, t_vars *vars)
+int			key_release_hook(int keycode, t_infos *cub)
 {
 	if (keycode == 126)
-		vars->player->walk_direction = 0;
+		cub->player->walk_direction = 0;
 	else if (keycode == 125)
-		vars->player->walk_direction = 0;
+		cub->player->walk_direction = 0;
 	else if (keycode == 123)
-		vars->player->turn_direction = 0;
+		cub->player->turn_direction = 0;
 	else if (keycode == 124)
-		vars->player->turn_direction = 0;
+		cub->player->turn_direction = 0;
 	return (1);
 }
 
@@ -404,65 +449,50 @@ int			key_release_hook(int keycode, t_vars *vars)
 }
 */
 
-int			check_collisions(int movestep, t_player *player)
+int			check_collisions(int movestep, t_infos *cub)
 {
 	int		next_x;
 	int		next_y;
 
-	next_x = player->x + cos(player->rotation_angle) * movestep;
-	next_y = player->y + sin(player->rotation_angle) * movestep;
-	if (grid[next_y / tile_size][next_x / tile_size] == 1)
-		return (1);
-	return (0);
+	next_x = cub->player->x + cos(cub->player->rotation_angle) * movestep;
+	next_y = cub->player->y + sin(cub->player->rotation_angle) * movestep;
+	if (cub->map[next_y / tile_size][next_x / tile_size] != '1')
+		return (0);
+	return (1);
 }
 
-int			render_next_frame(t_vars *vars)
+int			render_next_frame(t_infos *cub)
 {
 	int movestep;
 
-	mlx_hook(vars->win, 2, 1L << 0, key_hook, vars);
-	mlx_hook(vars->win, 3, 1L << 1, key_release_hook, vars);
-	vars->player->rotation_angle += vars->player->turn_direction *
-		vars->player->rotation_speed;
-	movestep = vars->player->walk_direction * vars->player->move_speed;
-	if (check_collisions(movestep, vars->player))
+	mlx_hook(cub->win, 2, 1L << 0, key_hook, cub);
+	mlx_hook(cub->win, 3, 1L << 1, key_release_hook, cub);
+	cub->player->rotation_angle += cub->player->turn_direction *
+		cub->player->rotation_speed;
+	movestep = cub->player->walk_direction * cub->player->move_speed;
+	if (check_collisions(movestep, cub))
 		return (1);
-	vars->player->x += cos(vars->player->rotation_angle) * movestep;
-	vars->player->y += sin(vars->player->rotation_angle) * movestep;
-	draw_map(vars, (vars->img));
+	cub->player->x += cos(cub->player->rotation_angle) * movestep;
+	cub->player->y += sin(cub->player->rotation_angle) * movestep;
+	draw_map(cub, (cub->img));
 	return (1);
 }
-/*
-int			main(void)
+
+int			launch_game(t_infos *cub)
 {
-	t_vars	vars;
 	t_data	img;
 
-	vars.mlx = mlx_init();
-	vars.win = mlx_new_window(vars.mlx, win_width, win_height, "Hello world!");
-	vars.player = player_init();
-	vars.img = &img;
-	img.img = mlx_new_image(vars.mlx, win_width, win_height);
+	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
+	cub->player = player_init(cub);
+	cub->img = &img;
+	img.img = mlx_new_image(cub->mlx, win_width, win_height);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
 			&img.endian);
-	draw_map(&vars, &img);
-	mlx_loop_hook(vars.mlx, render_next_frame, &vars);
-	mlx_loop(vars.mlx);
-}*/
-
-typedef struct	s_infos {
-		int		r[2];
-		t_data	*no;
-		t_data	*so;
-		t_data	*we;
-		t_data	*ea;
-		t_data	*s;
-		int		game_infos;
-		int		f[3];
-		int		c[3];
-		t_vars vars;
-}				t_infos;
-
+	draw_map(cub, &img);
+	mlx_loop_hook(cub->mlx, render_next_frame, cub);
+	mlx_loop(cub->mlx);
+	return (1);
+}
 
 int		get_texture(char *line, t_data *img, t_infos *cub)
 {
@@ -478,7 +508,7 @@ int		get_texture(char *line, t_data *img, t_infos *cub)
 	if (!line[i])
 		return (-1);
 	path = ft_strdup(line + i);
-	if (!(img = mlx_xpm_file_to_image(cub->vars.mlx, path, &size, &size)))
+	if (!(img = mlx_xpm_file_to_image(cub->mlx, path, &size, &size)))
 		return (-2);
 	return (1);
 }
@@ -593,13 +623,11 @@ int		map_is_valid(char **map, t_infos *cub)
 		j = -1;
 		while (map[i][++j])
 		{
-			printf("%c", map[i][j]);
 			if (check_map_errors(map, i, j, size))
 				return (0);
 			if (ft_strchr("NSEW", map[i][j]))
 				player_position += 1;
 		}
-		printf("\n");
 	}
 	if (!player_position || player_position > 1)
 		return (0);
@@ -639,7 +667,10 @@ int		parse_map(char *line, t_infos *cub, int fd)
 	}
 	map = ft_split(joined_map, '\n');
 	if (map_is_valid(map, cub))
+	{
+		cub->map = map;
 		return (1);
+	}
 	printf("invalid map");
 	return (free_map(map));
 }
@@ -678,7 +709,7 @@ int		read_file(t_infos *cub, int fd)
 		return (0);
 	}
 	cub->game_infos = 0;
-	cub->vars.mlx = mlx_init();
+	cub->mlx = mlx_init();
 	ret = get_next_line(fd, &line);
 	while (ret > 0)
 	{
@@ -692,6 +723,7 @@ int		read_file(t_infos *cub, int fd)
 	}
 	return (1);
 }
+
 int		main(int ac, char **av)
 {
 	int		fd;
@@ -700,4 +732,5 @@ int		main(int ac, char **av)
 	fd = open(av[1], O_RDONLY);
 	if (read_file(&cub, fd) == 0)
 		return (0);
+	launch_game(&cub);
 }
