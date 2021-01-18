@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/18 12:54:48 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/18 13:24:36 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -667,30 +667,37 @@ int		get_infos(t_infos *cub, char *line, int fd)
 	return (0);
 }
 
-int		main(int ac, char **av)
+int		read_file(t_infos *cub, int fd)
 {
-	int		fd;
 	int		ret;
 	char	*line;
-	t_infos	cub;
 
-	fd = open(av[1], O_RDONLY);
 	if (fd == -1)
 	{
 		perror("Error: ");
-		return (-1);
+		return (0);
 	}
-	cub.game_infos = 0;
-	cub.vars.mlx = mlx_init();
+	cub->game_infos = 0;
+	cub->vars.mlx = mlx_init();
 	ret = get_next_line(fd, &line);
 	while (ret > 0)
 	{
 		if (*line)
 		{
-			if (!get_infos(&cub, line, fd))
+			if (!get_infos(cub, line, fd))
 				return (0);
 		}
 		free(line);
 		ret = get_next_line(fd, &line);
 	}
+	return (1);
+}
+int		main(int ac, char **av)
+{
+	int		fd;
+	t_infos	cub;
+
+	fd = open(av[1], O_RDONLY);
+	if (read_file(&cub, fd) == 0)
+		return (0);
 }
