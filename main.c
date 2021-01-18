@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/16 20:06:13 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/18 12:12:19 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -505,7 +505,138 @@ int		get_digits_infos(char *line, int set[], int len)
 	return (1);
 }
 
-int		get_infos(t_infos *cub, char *line)
+int		is_map_start(char *line)
+{
+	int i;
+	int wall;
+
+	i = -1;
+	wall = 0;
+	while (line[++i])
+	{
+		if (line[i] != ' ' && line[i] != '1')
+			return (0);
+		if (line[i] == '1')
+			wall = 1;
+	}
+	return (wall);
+}
+
+char	*ft_strjoin_sup(char const *s1, char const *s2, char c)
+{
+	char	*str;
+	int		i;
+
+	if (s1 == NULL || !s2)
+		return (NULL);
+	if (!(str = (char *)malloc(sizeof(char) *
+					(ft_strlen(s1) + ft_strlen(s2) + 2))))
+		return (NULL);
+	i = 0;
+	while (*s1)
+	{
+		str[i] = *s1;
+		s1++;
+		i++;
+	}
+	str[i] = c;
+	i++;
+	while (*s2)
+	{
+		str[i] = *s2;
+		s2++;
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
+}
+
+int		check_map_errors(char **map, int i, int j, int size)
+{
+	char c;
+
+	c = map[i][j];
+	if (!ft_strchr(" 012NSEW", c))
+		return (1);
+	if (c == '1' || c == ' ')
+		return (0);
+	if (i == 0 || j == 0 || i == size - 1 || !map[i][j + 1])
+		return (1);
+	if (map[i - 1][j] == ' ' || map[i + 1][j] == ' ' || map[i][j - 1] == ' ' || map[i][j + 1] == ' ')
+		return (1);
+	return (0);
+}
+
+int		map_is_valid(char **map, t_infos *cub)
+{
+	int i;
+	int j;
+	int size;
+	int	player_position;
+	
+	player_position = 0;
+	i = -1;
+	while (map[++i])
+		;
+	size = i;
+	i = -1;
+	while (map[++i])
+	{
+		j = -1;
+		while (map[i][++j])
+		{
+			printf("%c", map[i][j]);
+			if (check_map_errors(map, i, j, size))
+				return (0);
+			if (ft_strchr("NSEW", map[i][j]))
+				player_position += 1;
+		}
+		printf("\n");
+	}
+	if (!player_position || player_position > 1)
+		return (0);
+	return (1);
+}
+
+int		free_map(char **map)
+{
+	int i;
+
+	i = -1;
+	//while (map[++i)
+	//	free(map[i]);
+	//free(map);
+	return (0);
+}
+
+int		parse_map(char *line, t_infos *cub, int fd)
+{
+	char	*joined_map;
+	char	**map;
+	char	*tmp;
+
+	joined_map = line;
+	while (get_next_line(fd, &line) > 0)
+	{
+		if (!(*line) || !ft_strchr(line, '1'))
+		{
+			free(line);
+			free(joined_map);
+			printf("invalid map");
+			return (0);
+		}
+		tmp = joined_map;
+		joined_map = ft_strjoin_sup(tmp, line, '\n');
+		free(line);
+	}
+	map = ft_split(joined_map, '\n');
+	if (map_is_valid(map, cub))
+		return (1);
+	printf("invalid map");
+	return (free_map(map));
+}
+
+int		get_infos(t_infos *cub, char *line, int fd)
 {
 	if (ft_strnstr(line, "R ", 2) == line)
 		return get_digits_infos(line + 2, cub->r, 2);
@@ -523,6 +654,8 @@ int		get_infos(t_infos *cub, char *line)
 		return get_digits_infos(line + 2, cub->f, 3);
 	else if (ft_strnstr(line, "C ", 2) == line)
 		return get_digits_infos(line + 2, cub->c, 3);
+	else if (is_map_start(line))
+		return (parse_map(line, cub, fd));
 	return (0);
 }
 
@@ -539,7 +672,7 @@ int		main(int ac, char **av)
 	while (ret > 0)
 	{
 		if (*line)
-			printf("%d\n", get_infos(&cub, line));
+			get_infos(&cub, line, fd);
 		free(line);
 		ret = get_next_line(fd, &line);
 	}
