@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/18 15:42:35 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/18 16:06:35 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,10 @@ void		put_tile(double tile_x, double tile_y, int wall, t_data *img)
 
 	i = 0;
 	j = 0;
-	while (i < tile_size /* minimap_scale*/)
+	while (i < tile_size *  minimap_scale)
 	{
 		j = 0;
-		while (j < tile_size /* minimap_scale*/)
+		while (j < tile_size * minimap_scale)
 		{
 			if (wall)
 				my_mlx_pixel_put(img, tile_x + i, tile_y + j, 0x002B0F89);
@@ -65,10 +65,10 @@ void		draw_grid(t_infos cub, t_data *img)
 			tile_x = j * tile_size;
 			tile_y = i * tile_size;
 			if (cub.map[i][j] == '1')
-				put_tile(tile_x /* minimap_scale*/, tile_y /* minimap_scale*/,
+				put_tile(tile_x * minimap_scale, tile_y * minimap_scale,
 					1, img);
 			else
-				put_tile(tile_x /* minimap_scale*/, tile_y /* minimap_scale*/,
+				put_tile(tile_x * minimap_scale, tile_y * minimap_scale,
 					0, img);
 			j++;
 		}
@@ -137,8 +137,8 @@ void		draw_player(t_infos cub, t_data *img)
 		y = -height;
 		while (y < height)
 		{
-			my_mlx_pixel_put(img, /*minimap_scale */ (player->x + x),
-					/*minimap_scale */ (player->y + y), 0x00FF0000);
+			my_mlx_pixel_put(img, minimap_scale * (player->x + x),
+					minimap_scale * (player->y + y), 0x00FF0000);
 			y++;
 		}
 		x++;
@@ -285,8 +285,12 @@ void		get_wall_position(t_ray *ray, t_player *player, t_infos *cub)
 		ray->distance = vertical_hit;
 }
 
-t_ray		*ray_init(double ray_angle, t_ray *ray)
+t_ray		*ray_init(double ray_angle)
 {
+	t_ray *ray;
+
+	if (!(ray = malloc(sizeof(t_ray))))
+		return (NULL);
 	ray->ray_angle = ft_abs_angle(ray_angle);
 	ray->distance = 10;
 	ray->wall_hitX = -1;
@@ -306,11 +310,11 @@ void		draw_rays(t_infos *cub, t_data *img)
 	t_ray	*ray;
 
 	i = -1;
-	while (++i < num_rays)
+	while (++i < cub->num_rays)
 	{
-		ray = &(cub->rays[i]);
-		my_mlx_pixel_put(img, /*minimap_scale */ ray->wall_hitX, /*minimap_scale
-				*/ ray->wall_hitY, 0x00FF0000);
+		ray = (cub->rays[i]);
+		my_mlx_pixel_put(img, minimap_scale * ray->wall_hitX, minimap_scale
+				* ray->wall_hitY, 0x00FF0000);
 	}
 }
 
@@ -322,12 +326,12 @@ void		raycast(t_infos *cub)
 
 	i = -1;
 	ray_angle = cub->player->rotation_angle - (fov_angle / 2);
-	while (++i < num_rays)
+	while (++i < cub->num_rays)
 	{
-		ray_init(ray_angle, &(cub->rays[i]));
-		ray = &(cub->rays[i]);
+		cub->rays[i] = ray_init(ray_angle);
+		ray = (cub->rays[i]);
 		get_wall_position(ray, cub->player, cub);
-		ray_angle += fov_angle / (double)num_rays;
+		ray_angle += fov_angle / (double)cub->num_rays;
 	}
 }
 
@@ -356,9 +360,9 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 	double	correct;
 
 	i = -1;
-	while (++i < num_rays)
+	while (++i < cub->num_rays)
 	{
-		ray = &(cub->rays[i]);
+		ray = (cub->rays[i]);
 		correct = ray->distance * cos(ray->ray_angle -
 				cub->player->rotation_angle);
 		proj_plane_dist = (cub->r[0] / 2) / tan(fov_angle / 2);
@@ -375,7 +379,7 @@ void		draw_map(t_infos *cub, t_data *img)
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
 			&img->line_length, &img->endian);
 	raycast(cub);
-	//draw_3d_map(cub, img);
+	draw_3d_map(cub, img);
 	draw_grid(*cub, img);
 	draw_player(*cub, img);
 	draw_rays(cub, img);
@@ -484,8 +488,10 @@ int			launch_game(t_infos *cub)
 
 	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
 	cub->player = player_init(cub);
+	cub->num_rays = cub->r[0] / wall_strip_width;
+	cub->rays = malloc(sizeof(t_ray *) * cub->num_rays);
 	cub->img = &img;
-	img.img = mlx_new_image(cub->mlx, win_width, win_height);
+	img.img = mlx_new_image(cub->mlx, cub->r[0], cub->r[1]);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
 			&img.endian);
 	draw_map(cub, &img);

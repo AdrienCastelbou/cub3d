@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/18 15:33:52 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/18 16:10:12 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,27 +20,9 @@
 #include "minilibx_opengl_20191021/mlx.h"
 #define INT_MAX 2147483647
 const int		tile_size = 64;
-const int		map_rows = 11;
-const int		map_cols = 15;
-const int		win_height = map_rows * tile_size;
-const int		win_width = map_cols * tile_size;
 const double	fov_angle = 60 * (M_PI / 180);
 const int		wall_strip_width = 1;
-const int		num_rays = win_width / wall_strip_width;
 const double	minimap_scale = 0.2;
-const int		grid[map_rows][map_cols] = {
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1},
-		{1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-	};
 
 typedef struct	s_ray {
 	double		ray_angle;
@@ -85,7 +67,8 @@ typedef struct	s_infos {
 		void		*win;
 		t_player	*player;
 		t_data		*img;
-		t_ray		rays[num_rays];
+		int			num_rays;
+		t_ray		**rays;
 }				t_infos;
 
 void			my_mlx_pixel_put(t_data *data, int x, int y, int color);
@@ -101,7 +84,7 @@ double			get_distance(double x1, double y1, double x2, double y2);
 double			check_horizontal_hit(t_ray *ray, t_player *player, t_infos *cub);
 double			check_vertical_hit(t_ray *ray, t_player *player, t_infos *vars);
 void			get_wall_position(t_ray *ray, t_player *player, t_infos *vars);
-t_ray			*ray_init(double ray_angle, t_ray *ray);
+t_ray			*ray_init(double ray_angle);
 void			draw_rays(t_infos *vars, t_data *img);
 void			raycast(t_infos *vars);
 void			draw_wall(t_infos *cub, int x, int y, int width, int height);
