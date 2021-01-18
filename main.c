@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/18 12:12:19 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/18 12:54:48 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -457,6 +457,7 @@ typedef struct	s_infos {
 		t_data	*we;
 		t_data	*ea;
 		t_data	*s;
+		int		game_infos;
 		int		f[3];
 		int		c[3];
 		t_vars vars;
@@ -469,6 +470,7 @@ int		get_texture(char *line, t_data *img, t_infos *cub)
 	int		size;
 	char	*path;
 
+	cub->game_infos += 1;
 	i = 0;
 	size = 32;
 	while (line[i] && line[i] == ' ')
@@ -481,11 +483,12 @@ int		get_texture(char *line, t_data *img, t_infos *cub)
 	return (1);
 }
 
-int		get_digits_infos(char *line, int set[], int len)
+int		get_digits_infos(char *line, int set[], int len, t_infos *cub)
 {
 	int	i;
 	int	index;
 
+	cub->game_infos +=1;
 	i = 0;
 	index = 0;
 	while (line[i] && index < len)
@@ -505,7 +508,7 @@ int		get_digits_infos(char *line, int set[], int len)
 	return (1);
 }
 
-int		is_map_start(char *line)
+int		is_map_start(char *line, t_infos *cub)
 {
 	int i;
 	int wall;
@@ -518,6 +521,11 @@ int		is_map_start(char *line)
 			return (0);
 		if (line[i] == '1')
 			wall = 1;
+	}
+	if (cub->game_infos != 8)
+	{
+		printf("Error : Wrong number of informations\n");
+		return (0);
 	}
 	return (wall);
 }
@@ -603,9 +611,9 @@ int		free_map(char **map)
 	int i;
 
 	i = -1;
-	//while (map[++i)
-	//	free(map[i]);
-	//free(map);
+	while (map[++i])
+		free(map[i]);
+	free(map);
 	return (0);
 }
 
@@ -639,7 +647,7 @@ int		parse_map(char *line, t_infos *cub, int fd)
 int		get_infos(t_infos *cub, char *line, int fd)
 {
 	if (ft_strnstr(line, "R ", 2) == line)
-		return get_digits_infos(line + 2, cub->r, 2);
+		return get_digits_infos(line + 2, cub->r, 2, cub);
 	else if (ft_strnstr(line, "NO ", 3) == line)
 		return get_texture(line + 3, cub->no, cub);
 	else if (ft_strnstr(line, "SO ", 3) == line)
@@ -651,10 +659,10 @@ int		get_infos(t_infos *cub, char *line, int fd)
 	else if (ft_strnstr(line, "S ", 2) == line)
 		return get_texture(line + 2, cub->s, cub);
 	else if (ft_strnstr(line, "F ", 2) == line)
-		return get_digits_infos(line + 2, cub->f, 3);
+		return get_digits_infos(line + 2, cub->f, 3, cub);
 	else if (ft_strnstr(line, "C ", 2) == line)
-		return get_digits_infos(line + 2, cub->c, 3);
-	else if (is_map_start(line))
+		return get_digits_infos(line + 2, cub->c, 3, cub);
+	else if (is_map_start(line, cub))
 		return (parse_map(line, cub, fd));
 	return (0);
 }
@@ -667,12 +675,21 @@ int		main(int ac, char **av)
 	t_infos	cub;
 
 	fd = open(av[1], O_RDONLY);
+	if (fd == -1)
+	{
+		perror("Error: ");
+		return (-1);
+	}
+	cub.game_infos = 0;
 	cub.vars.mlx = mlx_init();
 	ret = get_next_line(fd, &line);
 	while (ret > 0)
 	{
 		if (*line)
-			get_infos(&cub, line, fd);
+		{
+			if (!get_infos(&cub, line, fd))
+				return (0);
+		}
 		free(line);
 		ret = get_next_line(fd, &line);
 	}
