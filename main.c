@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 14:13:02 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 14:26:15 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -345,13 +345,13 @@ void		draw_wall(t_infos *cub, int x, int y, int height)
 	if (y < 0)
 		y = 0;
 	while (++i < y)
-		my_mlx_pixel_put(cub->img, x,  i,  get_color(cub->c));
+		my_mlx_pixel_put(cub->img, x,  i,  cub->c);
 	i = -1;
 	while (++i + y < cub->r[1])
 		if (i < height)
 			my_mlx_pixel_put(cub->img, x, y + i,  0x00FFFFFF);
 		else
-			my_mlx_pixel_put(cub->img, x, y +  i,  get_color(cub->f));
+			my_mlx_pixel_put(cub->img, x, y +  i,  cub->f);
 }
 
 
@@ -549,7 +549,7 @@ int		get_digits_infos(char *line, int set[], int len, t_infos *cub)
 	cub->game_infos +=1;
 	i = 0;
 	index = 0;
-	printf("Try to parse < %s > ...", line);
+	printf("Try to get resolution in < %s > ...", line);
 	while (line[i] && index < len)
 	{
 		if ((line[i] >= '0' && line[i] <= '9'))
@@ -568,6 +568,37 @@ int		get_digits_infos(char *line, int set[], int len, t_infos *cub)
 		return (0);
 	}
 	printf("[\033[0;32mSucces\033[0m]\n");
+	return (1);
+}
+
+int		get_field_and_sky_infos(char *line, int *color, int len, t_infos *cub)
+{
+	int	i;
+	int	index;
+	int	set[len];
+
+	cub->game_infos +=1;
+	i = -1;
+	index = 0;
+	printf("Try to get colors infos in < %s > ...", line);
+	while (line[++i] && index < len)
+	{
+		if ((line[i] >= '0' && line[i] <= '9'))
+		{
+			set[index] = ft_atoi(line + i);
+			index++;
+			while (line[i] && (line[i] >= '0' && line[i] <= '9'))
+				i++;
+			i -= 1;
+		}
+	}
+	if (line[i] || index != len)
+	{
+		printf("[\033[0;31mFailure\033[0m]\n\033[0;31m=> Wrong infos / number of\n");
+		return (0);
+	}
+	printf("[\033[0;32mSucces\033[0m]\n");
+	*color = get_color(set);
 	return (1);
 }
 
@@ -723,9 +754,9 @@ int		get_infos(t_infos *cub, char *line, int fd)
 	else if (ft_strnstr(line, "S ", 2) == line)
 		return get_texture(line + 2, &cub->s, cub);
 	else if (ft_strnstr(line, "F ", 2) == line)
-		return get_digits_infos(line + 2, cub->f, 3, cub);
+		return get_field_and_sky_infos(line + 2, &cub->f, 3, cub);
 	else if (ft_strnstr(line, "C ", 2) == line)
-		return get_digits_infos(line + 2, cub->c, 3, cub);
+		return get_field_and_sky_infos(line + 2, &cub->c, 3, cub);
 	else if (is_map_start(line, cub))
 		return (parse_map(line, cub, fd));
 	return (0);

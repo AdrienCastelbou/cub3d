@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 11:40:41 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 14:18:40 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,8 @@ typedef struct	s_infos {
 		t_data		*ea;
 		t_data		*s;
 		int			game_infos;
-		int			f[3];
-		int			c[3];
+		int			f;
+		int			c;
 		char		**map;
 		void		*mlx;
 		void		*win;
