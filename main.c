@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 10:16:23 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 10:26:56 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,13 +179,15 @@ int			is_in_the_grid(t_infos *cub, double yintercept, double xintercept)
 	y = -1;
 	while (cub->map[++y])
 		;
-	if (yintercept / tile_size > y)
+	if (yintercept / tile_size >= y)
 		return (0);
+	//write(1, "a\n", 2);
 	y = (int)yintercept / tile_size;
 	while (cub->map[y][++x])
 		;
-	if (xintercept / tile_size > x)
+	if (xintercept / tile_size >= x)
 		return (0);
+	//write(1, "b\n", 2);
 	return (1);
 }
 
@@ -394,6 +396,7 @@ int			key_hook(int keycode, t_infos *cub)
 	else if (keycode == 53)
 	{
 		free(cub->player);
+		free_map(cub->map);
 		mlx_destroy_window(cub->mlx, cub->win);
 		exit(0);
 	}
