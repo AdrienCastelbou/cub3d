@@ -6,23 +6,24 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 14:29:51 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 16:22:46 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CUB_H
-#define CUB_H
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include "minilibx_opengl_20191021/mlx.h"
-#define INT_MAX 2147483647
-const int		tile_size = 64;
-const double	fov_angle = 60 * (M_PI / 180);
-const int		wall_strip_width = 1;
-const double	minimap_scale = 0.2;
+# define CUB_H
+# include <unistd.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <math.h>
+# include <string.h>
+# include "minilibx_opengl_20191021/mlx.h"
+# include <fcntl.h>
+# include "gnl/get_next_line.h"
+# include "libft/libft.h"
+# define INT_MAX 2147483647
+#define tile_size  64
+#define	minimap_scale 0.2
 
 typedef struct	s_ray {
 	double		ray_angle;
@@ -43,6 +44,7 @@ typedef struct	s_player {
 	int			move_speed;
 	double		rotation_speed;
 	double		lateral_move;
+	double		fov_angle;
 }				t_player;
 
 typedef struct	s_data {
@@ -71,6 +73,23 @@ typedef struct	s_infos {
 		int			num_rays;
 		t_ray		*rays;
 }				t_infos;
+
+typedef	struct	s_hrzt_hit_checker {
+		int			ystep;
+		double		xstep;
+		double		xintercept;
+		int			yintercept;
+		double		distance;
+}				t_hrztl_hit_checker;
+
+typedef	struct	s_vrtcl_hit_checker {
+		double		ystep;
+		int			xstep;
+		int			xintercept;
+		double		yintercept;
+		double		distance;
+}				t_vrtcl_hit_checker;
+
 
 void			my_mlx_pixel_put(t_data *data, int x, int y, int color);
 void			put_tile(double tile_x, double tile_y, int wall, t_data *img);
@@ -106,4 +125,8 @@ int				is_map_start(char *line, t_infos *cub);
 int				get_digits_infos(char *line, int set[], int len, t_infos *cub);
 int				get_texture(char *line, t_data **img, t_infos *cub);
 int				free_and_quit(t_infos *cub);
+int				free_strs(char *s1, char *s2);
+int				get_color(int color[]);
+int				parsing_digits_statement(char c, int index, int len);
+int				launch_game(t_infos *cub);
 #endif

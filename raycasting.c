@@ -1,0 +1,45 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   raycasting.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/01/19 15:43:21 by acastelb          #+#    #+#             */
+/*   Updated: 2021/01/19 16:31:34 by acastelb         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "cub3d.h"
+
+t_ray		*ray_init(double ray_angle, t_ray *ray)
+{
+	ray->ray_angle = ft_abs_angle(ray_angle);
+	ray->distance = 10;
+	ray->wall_hitX = -1;
+	ray->wall_hitY = -1;
+	ray->is_go_down = 0;
+	ray->is_go_left = 0;
+	if (ray->ray_angle > 0 && ray->ray_angle < M_PI)
+		ray->is_go_down = 1;
+	if (ray->ray_angle > (0.5 * M_PI) && ray->ray_angle < 1.5 * M_PI)
+		ray->is_go_left = 1;
+	return (ray);
+}
+
+void		raycast(t_infos *cub)
+{
+	t_ray	*ray;
+	double	ray_angle;
+	int		i;
+
+	i = -1;
+	ray_angle = cub->player->rotation_angle - (cub->player->fov_angle / 2);
+	while (++i < cub->num_rays)
+	{
+		ray_init(ray_angle, &cub->rays[i]);
+		ray = &(cub->rays[i]);
+		get_wall_position(ray, cub->player, cub);
+		ray_angle += cub->player->fov_angle / (double)cub->num_rays;
+	}
+}
