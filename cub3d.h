@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 10:16:03 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 10:56:10 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ typedef struct	s_infos {
 		t_player	*player;
 		t_data		*img;
 		int			num_rays;
-		t_ray		**rays;
+		t_ray		*rays;
 }				t_infos;
 
 void			my_mlx_pixel_put(t_data *data, int x, int y, int color);
@@ -84,7 +84,7 @@ double			get_distance(double x1, double y1, double x2, double y2);
 double			check_horizontal_hit(t_ray *ray, t_player *player, t_infos *cub);
 double			check_vertical_hit(t_ray *ray, t_player *player, t_infos *vars);
 void			get_wall_position(t_ray *ray, t_player *player, t_infos *vars);
-t_ray			*ray_init(double ray_angle);
+t_ray			*ray_init(double ray_angle, t_ray *ray);
 void			draw_rays(t_infos *vars, t_data *img);
 void			raycast(t_infos *vars);
 void			draw_wall(t_infos *cub, int x, int y, int height);

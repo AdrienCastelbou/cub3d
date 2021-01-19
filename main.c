@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 10:45:37 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 10:56:11 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -285,12 +285,8 @@ void		get_wall_position(t_ray *ray, t_player *player, t_infos *cub)
 		ray->distance = vertical_hit;
 }
 
-t_ray		*ray_init(double ray_angle)
+t_ray		*ray_init(double ray_angle, t_ray *ray)
 {
-	t_ray *ray;
-
-	if (!(ray = malloc(sizeof(t_ray))))
-		return (NULL);
 	ray->ray_angle = ft_abs_angle(ray_angle);
 	ray->distance = 10;
 	ray->wall_hitX = -1;
@@ -304,6 +300,7 @@ t_ray		*ray_init(double ray_angle)
 	return (ray);
 }
 
+
 void		draw_rays(t_infos *cub, t_data *img)
 {
 	int		i;
@@ -312,7 +309,7 @@ void		draw_rays(t_infos *cub, t_data *img)
 	i = -1;
 	while (++i < cub->num_rays)
 	{
-		ray = (cub->rays[i]);
+		ray = &(cub->rays[i]);
 		my_mlx_pixel_put(img, minimap_scale * ray->wall_hitX, minimap_scale
 				* ray->wall_hitY, 0x00FF0000);
 	}
@@ -328,8 +325,8 @@ void		raycast(t_infos *cub)
 	ray_angle = cub->player->rotation_angle - (fov_angle / 2);
 	while (++i < cub->num_rays)
 	{
-		cub->rays[i] = ray_init(ray_angle);
-		ray = (cub->rays[i]);
+		ray_init(ray_angle, &cub->rays[i]);
+		ray = &(cub->rays[i]);
 		get_wall_position(ray, cub->player, cub);
 		ray_angle += fov_angle / (double)cub->num_rays;
 	}
@@ -369,7 +366,7 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 	i = -1;
 	while (++i < cub->num_rays)
 	{
-		ray = (cub->rays[i]);
+		ray = &(cub->rays[i]);
 		correct = ray->distance * cos(ray->ray_angle -
 				cub->player->rotation_angle);
 		proj_plane_dist = (cub->r[0] / 2) / tan(fov_angle / 2);
@@ -493,11 +490,12 @@ int			render_next_frame(t_infos *cub)
 int			launch_game(t_infos *cub)
 {
 	t_data	img;
+	t_ray	rays[cub->r[0]];
 
 	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
 	cub->player = player_init(cub);
-	cub->num_rays = cub->r[0] / wall_strip_width;
-	cub->rays = malloc(sizeof(t_ray *) * cub->num_rays);
+	cub->num_rays = cub->r[0];
+	cub->rays = rays;
 	cub->img = &img;
 	img.img = mlx_new_image(cub->mlx, cub->r[0], cub->r[1]);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
