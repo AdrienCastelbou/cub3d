@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 13:15:44 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 14:13:02 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -533,7 +533,8 @@ int		get_texture(char *line, t_data **img, t_infos *cub)
 	printf("Try to load < %s > texture...", path);
 	if (!(*img = mlx_xpm_file_to_image(cub->mlx, path, &size, &size)))
 	{
-		printf("[\033[0;31mFailure\033[0m]\n\033[0;31m=>  No such file or wrong file type, try .xpm");
+		printf("[\033[0;31mFailure\033[0m]\n\033[0;31m");
+		printf("=>  No such file or wrong file type, try with .xpm file\n");
 		return (0);
 	}
 	printf("[\033[0;32mSucces\033[0m]\n");
@@ -548,6 +549,7 @@ int		get_digits_infos(char *line, int set[], int len, t_infos *cub)
 	cub->game_infos +=1;
 	i = 0;
 	index = 0;
+	printf("Try to parse < %s > ...", line);
 	while (line[i] && index < len)
 	{
 		if ((line[i] >= '0' && line[i] <= '9'))
@@ -560,8 +562,12 @@ int		get_digits_infos(char *line, int set[], int len, t_infos *cub)
 		else
 			i++;
 	}
-	if (line[i])
+	if (line[i] || index != len)
+	{
+		printf("[\033[0;31mFailure\033[0m]\n\033[0;31m=> Wrong infos / number of\n");
 		return (0);
+	}
+	printf("[\033[0;32mSucces\033[0m]\n");
 	return (1);
 }
 
@@ -698,7 +704,7 @@ int		parse_map(char *line, t_infos *cub, int fd)
 		cub->map = map;
 		return (1);
 	}
-	printf("\033[0;31m nvalid map");
+	printf("\033[0;31m invalid map");
 	return (free_map(map));
 }
 
