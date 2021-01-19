@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 10:56:10 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 11:16:33 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,5 +103,5 @@ int				check_map_errors(char **map, int i, int j, int size);
 char			*ft_strjoin_sup(char const *s1, char const *s2, char c);
 int				is_map_start(char *line, t_infos *cub);
 int				get_digits_infos(char *line, int set[], int len, t_infos *cub);
-int				get_texture(char *line, t_data *img, t_infos *cub);
+int				get_texture(char *line, t_data **img, t_infos *cub);
 #endif

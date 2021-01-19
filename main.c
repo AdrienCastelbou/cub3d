@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 10:56:11 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 11:24:17 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -390,6 +390,18 @@ void		draw_map(t_infos *cub, t_data *img)
 	mlx_put_image_to_window(cub->mlx, cub->win, img->img, 0, 0);
 }
 
+void		free_all(t_infos *cub)
+{
+	free(cub->player);
+	free_map(cub->map);
+	mlx_destroy_image(cub->mlx, cub->no);
+	mlx_destroy_image(cub->mlx, cub->so);
+	mlx_destroy_image(cub->mlx, cub->we);
+	mlx_destroy_image(cub->mlx, cub->ea);
+	mlx_destroy_image(cub->mlx, cub->s);
+	mlx_destroy_window(cub->mlx, cub->win);
+}
+
 int			key_hook(int keycode, t_infos *cub)
 {
 	if (keycode == 126)
@@ -506,7 +518,7 @@ int			launch_game(t_infos *cub)
 	return (1);
 }
 
-int		get_texture(char *line, t_data *img, t_infos *cub)
+int		get_texture(char *line, t_data **img, t_infos *cub)
 {
 	int		i;
 	int		size;
@@ -518,10 +530,14 @@ int		get_texture(char *line, t_data *img, t_infos *cub)
 	while (line[i] && line[i] == ' ')
 		i++;
 	if (!line[i])
-		return (-1);
+		return (0);
 	path = ft_strdup(line + i);
-	if (!(img = mlx_xpm_file_to_image(cub->mlx, path, &size, &size)))
-		return (-2);
+	if (!(*img = mlx_xpm_file_to_image(cub->mlx, path, &size, &size)))
+	{
+		perror("Error: ");
+		return (0);
+	}
+	
 	return (1);
 }
 
@@ -546,7 +562,7 @@ int		get_digits_infos(char *line, int set[], int len, t_infos *cub)
 			i++;
 	}
 	if (line[i])
-		return (-1);
+		return (0);
 	return (1);
 }
 
@@ -692,15 +708,15 @@ int		get_infos(t_infos *cub, char *line, int fd)
 	if (ft_strnstr(line, "R ", 2) == line)
 		return get_digits_infos(line + 2, cub->r, 2, cub);
 	else if (ft_strnstr(line, "NO ", 3) == line)
-		return get_texture(line + 3, cub->no, cub);
+		return get_texture(line + 3, &cub->no, cub);
 	else if (ft_strnstr(line, "SO ", 3) == line)
-		return get_texture(line + 3, cub->so, cub);
+		return get_texture(line + 3, &cub->so, cub);
 	else if (ft_strnstr(line, "WE ", 3) == line)
-		return get_texture(line + 3, cub->we, cub);
+		return get_texture(line + 3, &cub->we, cub);
 	else if (ft_strnstr(line, "EA ", 3) == line)
-		return get_texture(line + 3, cub->ea, cub);
+		return get_texture(line + 3, &cub->ea, cub);
 	else if (ft_strnstr(line, "S ", 2) == line)
-		return get_texture(line + 2, cub->s, cub);
+		return get_texture(line + 2, &cub->s, cub);
 	else if (ft_strnstr(line, "F ", 2) == line)
 		return get_digits_infos(line + 2, cub->f, 3, cub);
 	else if (ft_strnstr(line, "C ", 2) == line)
