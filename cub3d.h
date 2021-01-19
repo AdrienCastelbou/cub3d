@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/18 16:10:12 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 10:16:03 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void			get_wall_position(t_ray *ray, t_player *player, t_infos *vars);
 t_ray			*ray_init(double ray_angle);
 void			draw_rays(t_infos *vars, t_data *img);
 void			raycast(t_infos *vars);
-void			draw_wall(t_infos *cub, int x, int y, int width, int height);
+void			draw_wall(t_infos *cub, int x, int y, int height);
 void			draw_3d_map(t_infos *cub, t_data *img);
 void			draw_map(t_infos *cub, t_data *img);
 int				key_hook(int keycode, t_infos *cub);

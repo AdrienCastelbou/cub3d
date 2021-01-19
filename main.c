@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/18 16:06:35 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 10:16:23 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -335,20 +335,15 @@ void		raycast(t_infos *cub)
 	}
 }
 
-void		draw_wall(t_infos *cub, int x, int y, int width, int height)
+void		draw_wall(t_infos *cub, int x, int y, int height)
 {
 	int		i;
-	int		j;
 
 	i = -1;
 	if (y < 0)
 		y = 0;
 	while (++i < height && y + i < cub->r[1])
-	{
-		j = -1;
-		while (++j < width)
-			my_mlx_pixel_put(cub->img, x + j, y + i,  0x00FFFFFF);
-	}
+		my_mlx_pixel_put(cub->img, x, y + i,  0x00FFFFFF);
 }
 
 void		draw_3d_map(t_infos *cub, t_data *img)
@@ -368,7 +363,7 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 		proj_plane_dist = (cub->r[0] / 2) / tan(fov_angle / 2);
 		wall_height = (tile_size / correct) * proj_plane_dist;
 		draw_wall(cub, i * wall_strip_width, (cub->r[1] / 2) -
-				(wall_height / 2), wall_strip_width, wall_height);
+				(wall_height / 2), wall_height);
 	}
 }
 
