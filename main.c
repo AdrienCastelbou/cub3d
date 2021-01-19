@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 10:26:56 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 10:45:37 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,13 +181,11 @@ int			is_in_the_grid(t_infos *cub, double yintercept, double xintercept)
 		;
 	if (yintercept / tile_size >= y)
 		return (0);
-	//write(1, "a\n", 2);
 	y = (int)yintercept / tile_size;
 	while (cub->map[y][++x])
 		;
 	if (xintercept / tile_size >= x)
 		return (0);
-	//write(1, "b\n", 2);
 	return (1);
 }
 
@@ -337,6 +335,11 @@ void		raycast(t_infos *cub)
 	}
 }
 
+int			get_color(int color[])
+{
+	return (color[0] << 16 | color[1] << 8 | color[2]);
+}
+
 void		draw_wall(t_infos *cub, int x, int y, int height)
 {
 	int		i;
@@ -344,9 +347,16 @@ void		draw_wall(t_infos *cub, int x, int y, int height)
 	i = -1;
 	if (y < 0)
 		y = 0;
-	while (++i < height && y + i < cub->r[1])
-		my_mlx_pixel_put(cub->img, x, y + i,  0x00FFFFFF);
+	while (++i < y)
+		my_mlx_pixel_put(cub->img, x,  i,  get_color(cub->c));
+	i = -1;
+	while (++i + y < cub->r[1])
+		if (i < height)
+			my_mlx_pixel_put(cub->img, x, y + i,  0x00FFFFFF);
+		else
+			my_mlx_pixel_put(cub->img, x, y +  i,  get_color(cub->f));
 }
+
 
 void		draw_3d_map(t_infos *cub, t_data *img)
 {
