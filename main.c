@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 11:24:17 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 11:39:04 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -390,7 +390,7 @@ void		draw_map(t_infos *cub, t_data *img)
 	mlx_put_image_to_window(cub->mlx, cub->win, img->img, 0, 0);
 }
 
-void		free_all(t_infos *cub)
+int		free_and_quit(t_infos *cub)
 {
 	free(cub->player);
 	free_map(cub->map);
@@ -400,6 +400,8 @@ void		free_all(t_infos *cub)
 	mlx_destroy_image(cub->mlx, cub->ea);
 	mlx_destroy_image(cub->mlx, cub->s);
 	mlx_destroy_window(cub->mlx, cub->win);
+	exit(0);
+	return (0);
 }
 
 int			key_hook(int keycode, t_infos *cub)
@@ -413,12 +415,7 @@ int			key_hook(int keycode, t_infos *cub)
 	else if (keycode == 124)
 		cub->player->turn_direction = 1;
 	else if (keycode == 53)
-	{
-		free(cub->player);
-		free_map(cub->map);
-		mlx_destroy_window(cub->mlx, cub->win);
-		exit(0);
-	}
+		free_and_quit(cub);
 	return (1);
 }
 
@@ -486,6 +483,7 @@ int			render_next_frame(t_infos *cub)
 {
 	int movestep;
 
+	mlx_hook(cub->win, 17, 1L << 17, free_and_quit, cub);
 	mlx_hook(cub->win, 2, 1L << 0, key_hook, cub);
 	mlx_hook(cub->win, 3, 1L << 1, key_release_hook, cub);
 	cub->player->rotation_angle += cub->player->turn_direction *
