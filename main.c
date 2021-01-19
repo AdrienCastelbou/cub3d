@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 11:39:04 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 13:15:44 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -530,12 +530,13 @@ int		get_texture(char *line, t_data **img, t_infos *cub)
 	if (!line[i])
 		return (0);
 	path = ft_strdup(line + i);
+	printf("Try to load < %s > texture...", path);
 	if (!(*img = mlx_xpm_file_to_image(cub->mlx, path, &size, &size)))
 	{
-		perror("Error: ");
+		printf("[\033[0;31mFailure\033[0m]\n\033[0;31m=>  No such file or wrong file type, try .xpm");
 		return (0);
 	}
-	
+	printf("[\033[0;32mSucces\033[0m]\n");
 	return (1);
 }
 
@@ -580,7 +581,7 @@ int		is_map_start(char *line, t_infos *cub)
 	}
 	if (cub->game_infos != 8)
 	{
-		printf("Error : Wrong number of informations\n");
+		printf("\033[0;31m Error : Wrong number of informations\n");
 		return (0);
 	}
 	return (wall);
@@ -684,7 +685,7 @@ int		parse_map(char *line, t_infos *cub, int fd)
 		{
 			free(line);
 			free(joined_map);
-			printf("invalid map");
+			printf("\033[0;31m invalid map");
 			return (0);
 		}
 		tmp = joined_map;
@@ -697,7 +698,7 @@ int		parse_map(char *line, t_infos *cub, int fd)
 		cub->map = map;
 		return (1);
 	}
-	printf("invalid map");
+	printf("\033[0;31m nvalid map");
 	return (free_map(map));
 }
 
@@ -731,7 +732,7 @@ int		read_file(t_infos *cub, int fd)
 
 	if (fd == -1)
 	{
-		perror("Error: ");
+		perror("\033[0;31m Error: ");
 		return (0);
 	}
 	cub->game_infos = 0;
