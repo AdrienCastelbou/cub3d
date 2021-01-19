@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 14:18:40 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 14:29:51 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct	s_player {
 	double		rotation_angle;
 	int			move_speed;
 	double		rotation_speed;
+	double		lateral_move;
 }				t_player;
 
 typedef struct	s_data {

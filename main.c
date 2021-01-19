@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 14:26:15 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/19 14:39:55 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,7 @@ t_player	*player_init(t_infos *cub)
 	player->move_speed = 3.0;
 	player->rotation_speed = 2 * (M_PI / 180);
 	get_player_infos(cub, player);
+	player->lateral_move = 0;
 	return (player);
 }
 
@@ -416,6 +417,16 @@ int			key_hook(int keycode, t_infos *cub)
 		cub->player->turn_direction = 1;
 	else if (keycode == 53)
 		free_and_quit(cub);
+	else if (keycode == 0)
+	{
+		cub->player->walk_direction = 1;
+		cub->player->lateral_move = - M_PI_2;
+	}
+	else if (keycode == 2)
+	{
+		cub->player->walk_direction = 1;
+		cub->player->lateral_move = M_PI_2;
+	}
 	return (1);
 }
 
@@ -429,6 +440,17 @@ int			key_release_hook(int keycode, t_infos *cub)
 		cub->player->turn_direction = 0;
 	else if (keycode == 124)
 		cub->player->turn_direction = 0;
+	else if (keycode == 0)
+	{
+		cub->player->walk_direction = 0;
+		cub->player->lateral_move = - 0;
+	}
+	else if (keycode == 2)
+	{
+		cub->player->walk_direction = 0;
+		cub->player->lateral_move = 0;
+	}
+
 	return (1);
 }
 
@@ -472,8 +494,8 @@ int			check_collisions(int movestep, t_infos *cub)
 	int		next_x;
 	int		next_y;
 
-	next_x = cub->player->x + cos(cub->player->rotation_angle) * movestep;
-	next_y = cub->player->y + sin(cub->player->rotation_angle) * movestep;
+	next_x = cub->player->x + cos(cub->player->rotation_angle + cub->player->lateral_move) * movestep;
+	next_y = cub->player->y + sin(cub->player->rotation_angle + cub->player->lateral_move) * movestep;
 	if (cub->map[next_y / tile_size][next_x / tile_size] != '1')
 		return (0);
 	return (1);
@@ -491,8 +513,8 @@ int			render_next_frame(t_infos *cub)
 	movestep = cub->player->walk_direction * cub->player->move_speed;
 	if (check_collisions(movestep, cub))
 		return (1);
-	cub->player->x += cos(cub->player->rotation_angle) * movestep;
-	cub->player->y += sin(cub->player->rotation_angle) * movestep;
+	cub->player->x += cos(cub->player->rotation_angle + cub->player->lateral_move) * movestep;
+	cub->player->y += sin(cub->player->rotation_angle + cub->player->lateral_move) * movestep;
 	draw_map(cub, (cub->img));
 	return (1);
 }
