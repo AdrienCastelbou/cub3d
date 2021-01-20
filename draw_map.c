@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 15:49:45 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/20 16:28:57 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,66 @@ int			get_color(int color[])
 	return (color[0] << 16 | color[1] << 8 | color[2]);
 }
 
-void		draw_wall(t_infos *cub, int x, int y, int height)
+int			*create_text(void)
 {
-	int		i;
+	int		*text;
+	int		x;
+	int		y;
 
+	text = malloc(sizeof(int) * (tile_size * tile_size));
+	x = -1;
+	while (++x < tile_size)
+	{
+		y = -1;
+		while (++y < tile_size)
+			if (x % 8 && y % 8)
+				text[tile_size * y + x] = 0x000000FF;
+			else
+				text[tile_size * y + x] = 0x00000000;
+	}
+	return (text);
+}
+
+void		draw_text(t_infos *cub, int *text)
+{
+	int		x;
+	int		y;
+
+	text = malloc(sizeof(int) * (tile_size * tile_size));
+	x = -1;
+	while (++x < tile_size)
+	{
+		y = -1;
+		while (++y < tile_size)
+			my_mlx_pixel_put(cub->img, 500 + x, 500 + y, text[tile_size * y + x]);
+	}
+
+}
+
+void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
+{
+	int			i;
+	int			offset_x;
+	int			offset_y;
+	int			real_y;
 	i = -1;
+	real_y = y;
 	if (y < 0)
 		y = 0;
 	while (++i < y)
 		my_mlx_pixel_put(cub->img, x, i, cub->c);
 	i = -1;
+	if (ray->is_vrtcl_hit)
+		offset_x = (int)ray->wall_hitY % tile_size;
+	else
+		offset_x = (int)ray->wall_hitX % tile_size;
 	while (++i + y < cub->r[1])
 		if (i < height)
-			my_mlx_pixel_put(cub->img, x, y + i, 0x00FFFFFF);
+		{
+			offset_y = ((i) * ((double) tile_size / height));
+			//printf("offset_x = %d, offset_y = %d, index = %d\n", offset_x, offset_y, tile_size * offset_y + offset_x);
+			my_mlx_pixel_put(cub->img, x, y + i, cub->texture[tile_size * offset_y + offset_x]);
+		}
 		else
 			my_mlx_pixel_put(cub->img, x, y + i, cub->f);
 }
@@ -51,7 +98,7 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 		proj_plane_dist = (cub->r[0] / 2) / tan(cub->player->fov_angle / 2);
 		wall_height = (tile_size / correct) * proj_plane_dist;
 		draw_wall(cub, i, (cub->r[1] / 2) -
-				(wall_height / 2), wall_height);
+				(wall_height / 2), wall_height, ray);
 	}
 }
 
@@ -86,5 +133,25 @@ int			render_next_frame(t_infos *cub)
 	cub->player->y += sin(cub->player->rotation_angle +
 			cub->player->lateral_move) * movestep;
 	draw_map(cub, (cub->img));
+	return (1);
+}
+
+int			launch_game(t_infos *cub)
+{
+	t_data	img;
+	t_ray	rays[cub->r[0]];
+
+	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
+	cub->player = player_init(cub);
+	cub->num_rays = cub->r[0];
+	cub->rays = rays;
+	cub->texture = create_text();
+	cub->img = &img;
+	img.img = mlx_new_image(cub->mlx, cub->r[0], cub->r[1]);
+	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
+			&img.endian);
+	draw_map(cub, &img);
+	mlx_loop_hook(cub->mlx, render_next_frame, cub);
+	mlx_loop(cub->mlx);
 	return (1);
 }

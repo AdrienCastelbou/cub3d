@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:56 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 16:31:57 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/20 14:59:42 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ double		check_vrtcl_hit_by_step(t_infos *cub, t_player *player,
 			{
 				ray->wall_hitX = checker.xintercept;
 				ray->wall_hitY = checker.yintercept;
+				ray->is_vrtcl_hit = 1;
 			}
 			return (checker.distance);
 		}

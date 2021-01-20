@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:43:21 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 16:31:34 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/20 14:59:07 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ t_ray		*ray_init(double ray_angle, t_ray *ray)
 	ray->wall_hitY = -1;
 	ray->is_go_down = 0;
 	ray->is_go_left = 0;
+	ray->is_vrtcl_hit = 0;
 	if (ray->ray_angle > 0 && ray->ray_angle < M_PI)
 		ray->is_go_down = 1;
 	if (ray->ray_angle > (0.5 * M_PI) && ray->ray_angle < 1.5 * M_PI)

@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:03:55 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 16:04:50 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/20 14:32:53 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int			check_collisions(int movestep, t_infos *cub)
 		return (0);
 	return (1);
 }
-
+/*
 int			launch_game(t_infos *cub)
 {
 	t_data	img;
@@ -105,6 +105,7 @@ int			launch_game(t_infos *cub)
 	cub->num_rays = cub->r[0];
 	cub->rays = rays;
 	cub->img = &img;
+	cub->texture = init_texture();
 	img.img = mlx_new_image(cub->mlx, cub->r[0], cub->r[1]);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
 			&img.endian);
@@ -112,4 +113,4 @@ int			launch_game(t_infos *cub)
 	mlx_loop_hook(cub->mlx, render_next_frame, cub);
 	mlx_loop(cub->mlx);
 	return (1);
-}
+}*/

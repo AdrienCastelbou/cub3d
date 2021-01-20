@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/20 11:13:51 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/20 16:07:03 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ typedef struct	s_ray {
 	int			wall_hitY;
 	int			is_go_down;
 	int			is_go_left;
+	int			is_vrtcl_hit;
 }				t_ray;
 
 typedef struct	s_player {
@@ -73,6 +74,7 @@ typedef struct	s_infos {
 		t_data		*img;
 		int			num_rays;
 		t_ray		*rays;
+		int			*texture;
 }				t_infos;
 
 typedef	struct	s_hrzt_hit_checker {
@@ -108,7 +110,7 @@ void			get_wall_position(t_ray *ray, t_player *player, t_infos *vars);
 t_ray			*ray_init(double ray_angle, t_ray *ray);
 void			draw_rays(t_infos *vars, t_data *img);
 void			raycast(t_infos *vars);
-void			draw_wall(t_infos *cub, int x, int y, int height);
+void			draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray);
 void			draw_3d_map(t_infos *cub, t_data *img);
 void			draw_map(t_infos *cub, t_data *img);
 int				key_hook(int keycode, t_infos *cub);
@@ -130,4 +132,5 @@ int				free_strs(char *s1, char *s2);
 int				get_color(int color[]);
 int				parsing_digits_statement(char c, int index, int len);
 int				launch_game(t_infos *cub);
+uint32_t		*init_texture(void);
 #endif
