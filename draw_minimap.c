@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:51:50 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 15:53:25 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/20 10:10:11 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void		draw_grid(t_infos cub, t_data *img)
 			if (cub.map[i][j] == '1')
 				put_tile(tile_x * minimap_scale, tile_y * minimap_scale,
 					1, img);
-			else
+			else if (cub.map[i][j] != ' ')
 				put_tile(tile_x * minimap_scale, tile_y * minimap_scale,
 					0, img);
 			j++;
