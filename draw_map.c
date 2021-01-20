@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/20 16:28:57 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/20 16:43:51 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
 	int			offset_x;
 	int			offset_y;
 	int			real_y;
+
 	i = -1;
 	real_y = y;
 	if (y < 0)
@@ -73,8 +74,10 @@ void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
 	while (++i + y < cub->r[1])
 		if (i < height)
 		{
-			offset_y = ((i) * ((double) tile_size / height));
-			//printf("offset_x = %d, offset_y = %d, index = %d\n", offset_x, offset_y, tile_size * offset_y + offset_x);
+			if (real_y < 0)
+				offset_y = ((i - real_y) * ((double) tile_size / height));
+			else
+				offset_y = ((i) * ((double) tile_size / height));
 			my_mlx_pixel_put(cub->img, x, y + i, cub->texture[tile_size * offset_y + offset_x]);
 		}
 		else
