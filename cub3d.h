@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/20 16:07:03 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 11:10:27 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include "gnl/get_next_line.h"
 # include "libft/libft.h"
 # define INT_MAX 2147483647
-#define tile_size  64
+#define tile_size  32
 #define	minimap_scale 0.2
 
 typedef struct	s_ray {

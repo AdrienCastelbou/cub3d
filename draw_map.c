@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/20 16:43:51 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 11:12:06 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,40 +17,9 @@ int			get_color(int color[])
 	return (color[0] << 16 | color[1] << 8 | color[2]);
 }
 
-int			*create_text(void)
+int			get_text_color(int *add, int pos)
 {
-	int		*text;
-	int		x;
-	int		y;
-
-	text = malloc(sizeof(int) * (tile_size * tile_size));
-	x = -1;
-	while (++x < tile_size)
-	{
-		y = -1;
-		while (++y < tile_size)
-			if (x % 8 && y % 8)
-				text[tile_size * y + x] = 0x000000FF;
-			else
-				text[tile_size * y + x] = 0x00000000;
-	}
-	return (text);
-}
-
-void		draw_text(t_infos *cub, int *text)
-{
-	int		x;
-	int		y;
-
-	text = malloc(sizeof(int) * (tile_size * tile_size));
-	x = -1;
-	while (++x < tile_size)
-	{
-		y = -1;
-		while (++y < tile_size)
-			my_mlx_pixel_put(cub->img, 500 + x, 500 + y, text[tile_size * y + x]);
-	}
-
+	return (add[pos]);
 }
 
 void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
@@ -78,7 +47,7 @@ void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
 				offset_y = ((i - real_y) * ((double) tile_size / height));
 			else
 				offset_y = ((i) * ((double) tile_size / height));
-			my_mlx_pixel_put(cub->img, x, y + i, cub->texture[tile_size * offset_y + offset_x]);
+			my_mlx_pixel_put(cub->img, x, y + i, get_text_color((int *)cub->no->addr, tile_size * offset_y + offset_x));
 		}
 		else
 			my_mlx_pixel_put(cub->img, x, y + i, cub->f);
@@ -148,7 +117,6 @@ int			launch_game(t_infos *cub)
 	cub->player = player_init(cub);
 	cub->num_rays = cub->r[0];
 	cub->rays = rays;
-	cub->texture = create_text();
 	cub->img = &img;
 	img.img = mlx_new_image(cub->mlx, cub->r[0], cub->r[1]);
 	img.addr = mlx_get_data_addr(img.img, &img.bits_per_pixel, &img.line_length,
