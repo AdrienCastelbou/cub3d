@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:22:49 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/20 10:42:41 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 11:49:59 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,20 +23,23 @@ int		free_map(char **map)
 	return (0);
 }
 
+int		free_textures(t_infos *cub, t_data *textures[])
+{
+	int i;
+
+	i = -1;
+	while (++i < 4)
+		mlx_destroy_image(cub->mlx, textures[i]);
+	return (0);
+}
+
 int		free_and_quit(t_infos *cub)
 {
 	if (cub->player)
 	free(cub->player);
 	if (cub->map)
 		free_map(cub->map);
-	if (cub->no)
-		mlx_destroy_image(cub->mlx, cub->no);
-	if (cub->so)
-		mlx_destroy_image(cub->mlx, cub->so);
-	if (cub->we)
-		mlx_destroy_image(cub->mlx, cub->we);
-	if (cub->ea)
-		mlx_destroy_image(cub->mlx, cub->ea);
+	free_textures(cub, cub->textures);
 	if (cub->s)
 		mlx_destroy_image(cub->mlx, cub->s);
 	if (cub->win)

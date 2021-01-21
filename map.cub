@@ -1,9 +1,9 @@
 R 1080 720
-NO ./test.xpm
-SO ./test.xpm
-WE ./test.xpm
-EA ./test.xpm
-S ./test.xpm
+NO ./pics/eagle.XPM
+SO ./pics/greystone.XPM
+WE ./pics/mossy.XPM
+EA ./pics/redbrick.XPM
+S ./pics/barrel.XPM
 F 220,100,0
 C 225,30,0
 

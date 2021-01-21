@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:27:37 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 16:08:16 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 11:46:20 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,13 +90,13 @@ int		get_infos(t_infos *cub, char *line, int fd)
 	if (ft_strnstr(line, "R ", 2) == line)
 		return (get_digits_infos(line + 2, cub->r, 2, cub));
 	else if (ft_strnstr(line, "NO ", 3) == line)
-		return (get_texture(line + 3, &cub->no, cub));
+		return (get_texture(line + 3, &cub->textures[0], cub));
 	else if (ft_strnstr(line, "SO ", 3) == line)
-		return (get_texture(line + 3, &cub->so, cub));
+		return (get_texture(line + 3, &cub->textures[1], cub));
 	else if (ft_strnstr(line, "WE ", 3) == line)
-		return (get_texture(line + 3, &cub->we, cub));
+		return (get_texture(line + 3, &cub->textures[2], cub));
 	else if (ft_strnstr(line, "EA ", 3) == line)
-		return (get_texture(line + 3, &cub->ea, cub));
+		return (get_texture(line + 3, &cub->textures[3], cub));
 	else if (ft_strnstr(line, "S ", 2) == line)
 		return (get_texture(line + 2, &cub->s, cub));
 	else if (ft_strnstr(line, "F ", 2) == line)

@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:12:06 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 11:42:50 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
 				offset_y = ((i - real_y) * ((double) tile_size / height));
 			else
 				offset_y = ((i) * ((double) tile_size / height));
-			my_mlx_pixel_put(cub->img, x, y + i, get_text_color((int *)cub->no->addr, tile_size * offset_y + offset_x));
+			my_mlx_pixel_put(cub->img, x, y + i,
+					get_text_color((int *)cub->textures[ray->side_hit]->addr, tile_size * offset_y + offset_x));
 		}
 		else
 			my_mlx_pixel_put(cub->img, x, y + i, cub->f);

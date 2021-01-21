@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:10:27 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 11:51:27 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include "gnl/get_next_line.h"
 # include "libft/libft.h"
 # define INT_MAX 2147483647
-#define tile_size  32
+#define tile_size  64
 #define	minimap_scale 0.2
 
 typedef struct	s_ray {
@@ -34,6 +34,7 @@ typedef struct	s_ray {
 	int			is_go_down;
 	int			is_go_left;
 	int			is_vrtcl_hit;
+	int			side_hit;
 }				t_ray;
 
 typedef struct	s_player {
@@ -59,10 +60,7 @@ typedef struct	s_data {
 
 typedef struct	s_infos {
 		int			r[2];
-		t_data		*no;
-		t_data		*so;
-		t_data		*we;
-		t_data		*ea;
+		t_data		*textures[4];
 		t_data		*s;
 		int			game_infos;
 		int			f;
@@ -74,7 +72,6 @@ typedef struct	s_infos {
 		t_data		*img;
 		int			num_rays;
 		t_ray		*rays;
-		int			*texture;
 }				t_infos;
 
 typedef	struct	s_hrzt_hit_checker {
