@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:27:37 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:46:20 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 16:21:04 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,5 +131,6 @@ int		read_file(t_infos *cub, int fd)
 		free(line);
 		ret = get_next_line(fd, &line);
 	}
+	cub->s_transparency = get_text_color((int*)cub->s->addr, 0);
 	return (1);
 }

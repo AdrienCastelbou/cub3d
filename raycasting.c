@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:43:21 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/20 14:59:07 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 15:48:22 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ t_ray		*ray_init(double ray_angle, t_ray *ray)
 		ray->is_go_down = 1;
 	if (ray->ray_angle > (0.5 * M_PI) && ray->ray_angle < 1.5 * M_PI)
 		ray->is_go_left = 1;
+	ray->object_hit = 0;
+	ray->obj_ray = malloc(sizeof(t_ray));
+	ray->obj_ray->distance = INT_MAX;
 	return (ray);
 }
 

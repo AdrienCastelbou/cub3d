@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:51:27 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 16:16:28 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,17 @@
 #define	minimap_scale 0.2
 
 typedef struct	s_ray {
-	double		ray_angle;
-	double		distance;
-	int			wall_hitX;
-	int			wall_hitY;
-	int			is_go_down;
-	int			is_go_left;
-	int			is_vrtcl_hit;
-	int			side_hit;
-}				t_ray;
+	double			ray_angle;
+	double			distance;
+	int				wall_hitX;
+	int				wall_hitY;
+	int				is_go_down;
+	int				is_go_left;
+	int				is_vrtcl_hit;
+	int				side_hit;
+	int				object_hit;
+	struct s_ray	*obj_ray;
+}					t_ray;
 
 typedef struct	s_player {
 	double		x;
@@ -72,6 +74,7 @@ typedef struct	s_infos {
 		t_data		*img;
 		int			num_rays;
 		t_ray		*rays;
+		int			s_transparency;
 }				t_infos;
 
 typedef	struct	s_hrzt_hit_checker {
@@ -130,4 +133,5 @@ int				get_color(int color[]);
 int				parsing_digits_statement(char c, int index, int len);
 int				launch_game(t_infos *cub);
 uint32_t		*init_texture(void);
+int				get_text_color(int *add, int pos);
 #endif

@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:42:50 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 16:42:11 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,47 @@ void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
 			my_mlx_pixel_put(cub->img, x, y + i, cub->f);
 }
 
+void		draw_sprite(t_infos *cub, int x, int y, int height, t_ray *ray)
+{
+	int	i;
+	int	real_y;
+	int color;
+	int			offset_x;
+	int			offset_y;
+
+	real_y = y;
+	if (y < 0)
+		y = 0;
+	i = -1;
+	if (ray->obj_ray->is_vrtcl_hit)
+		offset_x = (int)ray->obj_ray->wall_hitY % tile_size;
+	else
+		offset_x = (int)ray->obj_ray->wall_hitX % tile_size;
+	while (++i + y < cub->r[1] && i < height)
+	{
+		if (real_y < 0)
+			offset_y = ((i - real_y) * ((double) tile_size / height));
+		color = get_text_color((int *)cub->s->addr, tile_size * offset_y + offset_x);
+		if (color != cub->s_transparency)
+			my_mlx_pixel_put(cub->img, x, y + i, color);
+	}
+}
+
+void		draw_3d_sprite(t_infos *cub, t_data *img, t_ray *ray, int position)
+{
+	double	proj_plane_dist;
+	double	sprite_height;
+	double	correct;
+
+	correct = ray->obj_ray->distance * cos(ray->ray_angle -
+			cub->player->rotation_angle);
+	proj_plane_dist = (cub->r[0] / 2) / tan(cub->player->fov_angle / 2);
+	sprite_height = (tile_size / correct) * proj_plane_dist;
+	draw_sprite(cub, position, (cub->r[1] / 2) -
+			(sprite_height / 2), sprite_height, ray);
+
+}
+
 void		draw_3d_map(t_infos *cub, t_data *img)
 {
 	int		i;
@@ -72,6 +113,9 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 		wall_height = (tile_size / correct) * proj_plane_dist;
 		draw_wall(cub, i, (cub->r[1] / 2) -
 				(wall_height / 2), wall_height, ray);
+		if (ray->object_hit)
+			draw_3d_sprite(cub, img, ray, i);
+		free(ray->obj_ray);
 	}
 }
 

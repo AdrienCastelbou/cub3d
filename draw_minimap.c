@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:51:50 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/20 10:10:11 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 15:57:18 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,21 @@ void		put_tile(double tile_x, double tile_y, int wall, t_data *img)
 {
 	int	i;
 	int	j;
+	int	color;
 
 	i = 0;
 	j = 0;
+	if (wall == 1)
+		color = 0x002B0F89;
+	else if (wall == 2)
+		color = 0x000A6B0A;
+	else
+		color = 0x00000000;
 	while (i < tile_size * minimap_scale)
 	{
-		j = 0;
-		while (j < tile_size * minimap_scale)
-		{
-			if (wall)
-				my_mlx_pixel_put(img, tile_x + i, tile_y + j, 0x002B0F89);
-			else
-				my_mlx_pixel_put(img, tile_x + i, tile_y + j, 0x00000000);
-			j++;
-		}
+		j = -1;
+		while (++j < tile_size * minimap_scale)
+			my_mlx_pixel_put(img, tile_x + i, tile_y + j, color);
 		i++;
 	}
 }
@@ -64,7 +65,7 @@ void		draw_grid(t_infos cub, t_data *img)
 					1, img);
 			else if (cub.map[i][j] != ' ')
 				put_tile(tile_x * minimap_scale, tile_y * minimap_scale,
-					0, img);
+					cub.map[i][j] - '0', img);
 			j++;
 		}
 		i++;

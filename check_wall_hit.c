@@ -6,11 +6,44 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:56 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:43:50 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 16:35:01 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
+
+void		hrztl_object_hit(t_infos *cub, t_player *player,
+		t_ray *ray, t_hrztl_hit_checker checker)
+{
+	t_ray *obj_ray;
+
+	obj_ray = ray->obj_ray;
+	obj_ray->wall_hitX = checker.xintercept;
+	obj_ray->wall_hitY = checker.yintercept;
+	obj_ray->distance = get_distance(player->x, player->y,
+						checker.xintercept, checker.yintercept);
+	ray->object_hit = 1;
+}
+
+void		vrtcl_object_hit(t_infos *cub, t_player *player,
+		t_ray *ray, t_vrtcl_hit_checker checker)
+{
+	t_ray *obj_ray;
+
+	checker.distance = get_distance(player->x, player->y,
+						checker.xintercept, checker.yintercept);
+	if ((checker.distance < ray->obj_ray->distance &&
+			checker.distance < ray->distance) || !ray->object_hit)
+	{
+		obj_ray = ray->obj_ray;
+		obj_ray->wall_hitX = checker.xintercept;
+		obj_ray->wall_hitY = checker.yintercept;
+		obj_ray->distance = checker.distance;
+		obj_ray->is_vrtcl_hit = 1;
+		ray->object_hit = 1;
+
+	}
+}
 
 double		check_hrztl_hit_by_step(t_infos *cub, t_player *player,
 		t_ray *ray, t_hrztl_hit_checker checker)
@@ -25,6 +58,9 @@ double		check_hrztl_hit_by_step(t_infos *cub, t_player *player,
 			return (get_distance(player->x, player->y,
 						checker.xintercept, checker.yintercept));
 		}
+		else if (cub->map[checker.yintercept / tile_size]
+				[(int)checker.xintercept / tile_size] == '2')
+			hrztl_object_hit(cub, player, ray, checker);
 		checker.yintercept += checker.ystep;
 		checker.xintercept += checker.xstep;
 	}
@@ -71,6 +107,9 @@ double		check_vrtcl_hit_by_step(t_infos *cub, t_player *player,
 			}
 			return (checker.distance);
 		}
+		else if (cub->map[(int)checker.yintercept / tile_size]
+				[checker.xintercept / tile_size] == '2')
+			vrtcl_object_hit(cub, player, ray, checker);
 		checker.yintercept += checker.ystep;
 		checker.xintercept += checker.xstep;
 	}
@@ -111,6 +150,8 @@ void		get_wall_position(t_ray *ray, t_player *player, t_infos *cub)
 		ray->distance = horizontal_hit;
 	else
 		ray->distance = vertical_hit;
+	if (vertical_hit < horizontal_hit && ray->object_hit && ray->obj_ray->is_vrtcl_hit)
+		ray->object_hit = 0;
 	if (ray->is_vrtcl_hit && ray->is_go_left)
 		ray->side_hit = 3;
 	else if (ray->is_vrtcl_hit && !ray->is_go_left)
