@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 16:42:11 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:03:03 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,22 +58,24 @@ void		draw_sprite(t_infos *cub, int x, int y, int height, t_ray *ray)
 {
 	int	i;
 	int	real_y;
-	int color;
-	int			offset_x;
-	int			offset_y;
+	int	color;
+	int	offset_x;
+	int	offset_y;
 
 	real_y = y;
 	if (y < 0)
 		y = 0;
 	i = -1;
 	if (ray->obj_ray->is_vrtcl_hit)
-		offset_x = (int)ray->obj_ray->wall_hitY % tile_size;
+		offset_x = ray->obj_ray->wall_hitY % tile_size;
 	else
-		offset_x = (int)ray->obj_ray->wall_hitX % tile_size;
+		offset_x = ray->obj_ray->wall_hitX % tile_size;
 	while (++i + y < cub->r[1] && i < height)
 	{
 		if (real_y < 0)
 			offset_y = ((i - real_y) * ((double) tile_size / height));
+		else
+			offset_y = ((i) * ((double) tile_size / height));
 		color = get_text_color((int *)cub->s->addr, tile_size * offset_y + offset_x);
 		if (color != cub->s_transparency)
 			my_mlx_pixel_put(cub->img, x, y + i, color);

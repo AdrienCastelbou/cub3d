@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:56 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 16:35:01 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:02:48 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ void		hrztl_object_hit(t_infos *cub, t_player *player,
 	obj_ray->wall_hitY = checker.yintercept;
 	obj_ray->distance = get_distance(player->x, player->y,
 						checker.xintercept, checker.yintercept);
+	obj_ray->is_vrtcl_hit = 0;
 	ray->object_hit = 1;
+
 }
 
 void		vrtcl_object_hit(t_infos *cub, t_player *player,
@@ -41,7 +43,6 @@ void		vrtcl_object_hit(t_infos *cub, t_player *player,
 		obj_ray->distance = checker.distance;
 		obj_ray->is_vrtcl_hit = 1;
 		ray->object_hit = 1;
-
 	}
 }
 
@@ -109,7 +110,7 @@ double		check_vrtcl_hit_by_step(t_infos *cub, t_player *player,
 		}
 		else if (cub->map[(int)checker.yintercept / tile_size]
 				[checker.xintercept / tile_size] == '2')
-			vrtcl_object_hit(cub, player, ray, checker);
+			;//vrtcl_object_hit(cub, player, ray, checker);
 		checker.yintercept += checker.ystep;
 		checker.xintercept += checker.xstep;
 	}
@@ -150,8 +151,8 @@ void		get_wall_position(t_ray *ray, t_player *player, t_infos *cub)
 		ray->distance = horizontal_hit;
 	else
 		ray->distance = vertical_hit;
-	if (vertical_hit < horizontal_hit && ray->object_hit && ray->obj_ray->is_vrtcl_hit)
-		ray->object_hit = 0;
+//	if (vertical_hit < horizontal_hit && ray->object_hit && ray->obj_ray->is_vrtcl_hit)
+//		ray->object_hit = 0;
 	if (ray->is_vrtcl_hit && ray->is_go_left)
 		ray->side_hit = 3;
 	else if (ray->is_vrtcl_hit && !ray->is_go_left)
@@ -160,4 +161,21 @@ void		get_wall_position(t_ray *ray, t_player *player, t_infos *cub)
 		ray->side_hit = 1;
 	else
 		ray->side_hit = 0;
+}
+
+void		raycast(t_infos *cub)
+{
+	t_ray	*ray;
+	double	ray_angle;
+	int		i;
+
+	i = -1;
+	ray_angle = cub->player->rotation_angle - (cub->player->fov_angle / 2);
+	while (++i < cub->num_rays)
+	{
+		ray_init(ray_angle, &cub->rays[i]);
+		ray = &(cub->rays[i]);
+		get_wall_position(ray, cub->player, cub);
+		ray_angle += cub->player->fov_angle / (double)cub->num_rays;
+	}
 }

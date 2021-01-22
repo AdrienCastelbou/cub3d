@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:43:21 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 15:48:22 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/21 17:19:17 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ t_ray		*ray_init(double ray_angle, t_ray *ray)
 	ray->obj_ray->distance = INT_MAX;
 	return (ray);
 }
-
+/*
 void		raycast(t_infos *cub)
 {
 	t_ray	*ray;
@@ -46,4 +46,4 @@ void		raycast(t_infos *cub)
 		get_wall_position(ray, cub->player, cub);
 		ray_angle += cub->player->fov_angle / (double)cub->num_rays;
 	}
-}
+}*/
