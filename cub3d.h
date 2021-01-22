@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 16:16:28 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/22 14:30:42 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,6 @@ typedef struct	s_ray {
 	int				is_go_left;
 	int				is_vrtcl_hit;
 	int				side_hit;
-	int				object_hit;
-	struct s_ray	*obj_ray;
 }					t_ray;
 
 typedef struct	s_player {
