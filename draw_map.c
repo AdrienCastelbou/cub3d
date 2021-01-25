@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/25 16:14:20 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/25 16:54:20 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,61 @@ void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
 			my_mlx_pixel_put(cub->img, x, y + i, cub->f);
 }
 
+void		switch_sprites(t_sprite **s1, t_sprite **s2)
+{
+	t_sprite *tmp;
+
+	tmp = *s1;
+	*s1 = *s2;
+	*s2 = tmp;
+}
+
+void		sort_sprites(int *order, double *dst, int nb, t_sprite **sprites)
+{
+	int		i;
+	int		j;
+	int		t_order;
+	double	t_dst;
+
+
+	i = -1;
+	
+	while (i++ < nb -1)
+	{
+		j = i;
+		while (++j < nb)
+			if (dst[i] < dst[j])
+			{
+				t_order = order[i];
+				order[i] = order[j];
+				order[j] = t_order;
+				t_dst = dst[i];
+				dst[i] = dst[j];
+				dst[j] = t_dst;
+				switch_sprites(&sprites[i], &sprites[j]);
+			}
+	}
+}
+
+void		sprite_casting(t_infos *cub)
+{
+	int i;
+	t_sprite *tmp;
+
+	i = -1;
+	while (++i < cub->sprites_nb)
+	{
+		cub->sprite_order[i] = i;
+		cub->sprite_dst[i] = get_distance(cub->player->x,
+				cub->player->y,
+				cub->sprites[i]->x * tile_size,
+				cub->sprites[i]->y * tile_size);
+	}
+	sort_sprites(cub->sprite_order, cub->sprite_dst, cub->sprites_nb, cub->sprites);
+	i = -1;
+}
+int bro = 0;
+
 void		draw_3d_map(t_infos *cub, t_data *img)
 {
 	int		i;
@@ -74,6 +129,9 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 		draw_wall(cub, i, (cub->r[1] / 2) -
 				(wall_height / 2), wall_height, ray);
 	}
+	if (bro == 0)
+		sprite_casting(cub);
+	bro = 1;
 }
 
 void		draw_map(t_infos *cub, t_data *img)
@@ -114,11 +172,15 @@ int			launch_game(t_infos *cub)
 {
 	t_data	img;
 	t_ray	rays[cub->r[0]];
+	int		sprite_order[cub->r[0]];
 	double	zbuffer[cub->r[0]];
+	double	sprite_dist[cub->r[0]];
 
 	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
 	cub->player = player_init(cub);
 	cub->zbuffer = zbuffer;
+	cub->sprite_order = sprite_order;
+	cub->sprite_dst = sprite_dist;
 	cub->num_rays = cub->r[0];
 	cub->rays = rays;
 	cub->img = &img;
