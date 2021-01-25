@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/22 14:32:49 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/25 16:14:20 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 		ray = &(cub->rays[i]);
 		correct = ray->distance * cos(ray->ray_angle -
 				cub->player->rotation_angle);
+		cub->zbuffer[i] = correct;
 		proj_plane_dist = (cub->r[0] / 2) / tan(cub->player->fov_angle / 2);
 		wall_height = (tile_size / correct) * proj_plane_dist;
 		draw_wall(cub, i, (cub->r[1] / 2) -
@@ -113,9 +114,11 @@ int			launch_game(t_infos *cub)
 {
 	t_data	img;
 	t_ray	rays[cub->r[0]];
+	double	zbuffer[cub->r[0]];
 
 	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
 	cub->player = player_init(cub);
+	cub->zbuffer = zbuffer;
 	cub->num_rays = cub->r[0];
 	cub->rays = rays;
 	cub->img = &img;

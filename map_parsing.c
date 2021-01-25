@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing.c                                          :+:      :+:    :+:   */
+/*   map_parsing.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 14:59:38 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/19 15:21:59 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/25 15:56:56 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,13 @@ int		is_map_start(char *line, t_infos *cub)
 	return (wall);
 }
 
-int		check_map_errors(char **map, int i, int j, int size)
+int		check_map_errors(t_infos *cub, int i, int j, int size)
 {
 	char c;
+	char **map;
 
-	c = map[i][j];
+	map = cub->map;
+	c = cub->map[i][j];
 	if (!ft_strchr(" 012NSEW", c))
 		return (1);
 	if (c == '1' || c == ' ')
@@ -77,7 +79,19 @@ int		check_map_errors(char **map, int i, int j, int size)
 	if (map[i - 1][j] == ' ' || map[i + 1][j] == ' ' ||
 			map[i][j - 1] == ' ' || map[i][j + 1] == ' ')
 		return (1);
+	if (map[i][j] == '2')
+		cub->sprites_nb += 1;
 	return (0);
+}
+
+int		ft_sptrlen(char **str)
+{
+	int i;
+
+	i = -1;
+	while (str[++i])
+		;
+	return (i);
 }
 
 int		map_is_valid(char **map, t_infos *cub)
@@ -87,18 +101,16 @@ int		map_is_valid(char **map, t_infos *cub)
 	int size;
 	int	player_position;
 
+	cub->sprites_nb = 0;
 	player_position = 0;
-	i = -1;
-	while (map[++i])
-		;
-	size = i;
+	size = ft_sptrlen(map);;
 	i = -1;
 	while (map[++i])
 	{
 		j = -1;
 		while (map[i][++j])
 		{
-			if (check_map_errors(map, i, j, size))
+			if (check_map_errors(cub, i, j, size))
 				return (0);
 			if (ft_strchr("NSEW", map[i][j]))
 				player_position += 1;
@@ -129,11 +141,9 @@ int		parse_map(char *line, t_infos *cub, int fd)
 		free(line);
 	}
 	map = ft_split(joined_map, '\n');
+	cub->map = map;
 	if (map_is_valid(map, cub))
-	{
-		cub->map = map;
 		return (1);
-	}
 	printf("\033[0;31m invalid map");
 	return (free_map(map));
 }

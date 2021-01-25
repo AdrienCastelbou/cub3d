@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:22:49 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:49:59 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/25 15:52:12 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,16 @@ int		free_textures(t_infos *cub, t_data *textures[])
 	return (0);
 }
 
+void	free_sprites(t_sprite **sprites)
+{
+	int i;
+
+	i = -1;
+	while (sprites[++i])
+		free(sprites[i]);
+	free(sprites);
+}
+
 int		free_and_quit(t_infos *cub)
 {
 	if (cub->player)
@@ -40,6 +50,7 @@ int		free_and_quit(t_infos *cub)
 	if (cub->map)
 		free_map(cub->map);
 	free_textures(cub, cub->textures);
+	free_sprites(cub->sprites);
 	if (cub->s)
 		mlx_destroy_image(cub->mlx, cub->s);
 	if (cub->win)

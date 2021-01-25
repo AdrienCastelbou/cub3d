@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/22 14:30:42 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/25 15:46:57 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,11 @@ typedef struct	s_data {
 	int			endian;
 }				t_data;
 
+typedef struct	s_sprite {
+		double x;
+		double y;
+}				t_sprite;
+
 typedef struct	s_infos {
 		int			r[2];
 		t_data		*textures[4];
@@ -73,6 +78,11 @@ typedef struct	s_infos {
 		int			num_rays;
 		t_ray		*rays;
 		int			s_transparency;
+		t_sprite	**sprites;
+		int			sprites_nb;
+		double		*zbuffer;
+		int			*sprite_order;
+		double		*sprite_dst;
 }				t_infos;
 
 typedef	struct	s_hrzt_hit_checker {
@@ -120,7 +130,7 @@ int				get_infos(t_infos *cub, char *line, int fd);
 int				parse_map(char *line, t_infos *cub, int fd);
 int				free_map(char **map);
 int				map_is_valid(char **map, t_infos *cub);
-int				check_map_errors(char **map, int i, int j, int size);
+int				check_map_errors(t_infos *cub, int i, int j, int size);
 char			*ft_strjoin_sup(char const *s1, char const *s2, char c);
 int				is_map_start(char *line, t_infos *cub);
 int				get_digits_infos(char *line, int set[], int len, t_infos *cub);

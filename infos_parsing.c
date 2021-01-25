@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:27:37 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 16:21:04 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/25 16:12:15 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,34 @@ int		get_infos(t_infos *cub, char *line, int fd)
 	return (0);
 }
 
-int		read_file(t_infos *cub, int fd)
+t_sprite	**get_sprites_pos(t_infos *cub, char **map)
+{
+	int			i;
+	int			j;
+	int			index;
+	t_sprite	**sprites;
+
+	if (!(sprites = malloc(sizeof(t_sprite *) * (cub->sprites_nb + 1))))
+		return (NULL);
+	index = 0;
+	i = -1;
+	while (map[++i])
+	{
+		j = -1;
+		while (map[i][++j])
+			if (map[i][j] == '2')
+			{
+				sprites[index] = malloc(sizeof(t_sprite));
+				sprites[index]->x = j;
+				sprites[index]->y = i;
+				index += 1;
+			}
+	}
+	sprites[index] = NULL;
+	return (sprites);
+}
+
+int			read_file(t_infos *cub, int fd)
 {
 	int		ret;
 	char	*line;
@@ -131,6 +158,8 @@ int		read_file(t_infos *cub, int fd)
 		free(line);
 		ret = get_next_line(fd, &line);
 	}
+	if (cub->sprites_nb > 0)
+		cub->sprites = get_sprites_pos(cub, cub->map);
 	cub->s_transparency = get_text_color((int*)cub->s->addr, 0);
 	return (1);
 }
