@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 10:16:50 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/26 14:46:46 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ typedef struct	s_data {
 typedef struct	s_sprite {
 		double	x;
 		double	y;
+		double	distance;
 		double	angle;
 		int		is_visible;
 }				t_sprite;
@@ -83,8 +84,6 @@ typedef struct	s_infos {
 		t_sprite	**sprites;
 		int			sprites_nb;
 		double		*zbuffer;
-		int			*sprite_order;
-		double		*sprite_dst;
 }				t_infos;
 
 typedef	struct	s_hrzt_hit_checker {

@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 14:35:22 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/26 14:48:52 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,29 +63,22 @@ void		switch_sprites(t_sprite **s1, t_sprite **s2)
 	*s2 = tmp;
 }
 
-void		sort_sprites(int *order, double *dst, int nb, t_sprite **sprites)
+void		sort_sprites(int nb, t_sprite **sprites)
 {
 	int		i;
 	int		j;
-	int		t_order;
-	double	t_dst;
+	t_sprite *tmp;
 
-
-	i = -1;
-	
-	while (i++ < nb -1)
+	i = -1;	
+	while (i++ < nb - 1)
 	{
 		j = i;
 		while (++j < nb)
-			if (dst[i] < dst[j])
+			if (sprites[i]->distance < sprites[j]->distance)
 			{
-				t_order = order[i];
-				order[i] = order[j];
-				order[j] = t_order;
-				t_dst = dst[i];
-				dst[i] = dst[j];
-				dst[j] = t_dst;
-				switch_sprites(&sprites[i], &sprites[j]);
+				tmp = sprites[i];
+				sprites[i] = sprites[j];
+				sprites[j] = tmp;
 			}
 	}
 }
@@ -101,7 +94,6 @@ double		get_sprite_angle(t_player *player, double rot_angle, double sx, double s
 	y_vector = sy - player->y ;
 	angle = atan2(y_vector, x_vector);
 	s_angle = angle - rot_angle;
-	//printf("sAngle = %f, a = %f\n", s_angle, angle);
 	return (s_angle);
 }
 
@@ -126,26 +118,19 @@ return (1);
 void		sprite_casting(t_infos *cub)
 {
 	int i;
-	t_sprite *tmp;
 
 	i = -1;
 	while (++i < cub->sprites_nb)
 	{
-		cub->sprites[i]->angle = get_sprite_angle(cub->player, cub->player->rotation_angle, cub->sprites[i]->x * tile_size, cub->sprites[i]->y * tile_size);
-		cub->sprites[i]->is_visible = is_visible(cub->sprites[i]->angle, cub->player->fov_angle);
-	}
-	i = -1;
-	while (++i < cub->sprites_nb)
-	{
-		cub->sprite_order[i] = i;
-		cub->sprite_dst[i] = get_distance(cub->player->x,
+		cub->sprites[i]->distance = get_distance(cub->player->x,
 				cub->player->y,
 				cub->sprites[i]->x * tile_size,
 				cub->sprites[i]->y * tile_size);
+		cub->sprites[i]->angle = get_sprite_angle(cub->player, cub->player->rotation_angle, cub->sprites[i]->x * tile_size, cub->sprites[i]->y * tile_size);
+		cub->sprites[i]->is_visible = is_visible(cub->sprites[i]->angle, cub->player->fov_angle);
 	}
-	sort_sprites(cub->sprite_order, cub->sprite_dst, cub->sprites_nb, cub->sprites);
+	sort_sprites(cub->sprites_nb, cub->sprites);
 }
-int bro = 0;
 
 void		draw_3d_map(t_infos *cub, t_data *img)
 {
@@ -208,15 +193,11 @@ int			launch_game(t_infos *cub)
 {
 	t_data	img;
 	t_ray	rays[cub->r[0]];
-	int		sprite_order[cub->r[0]];
 	double	zbuffer[cub->r[0]];
-	double	sprite_dist[cub->r[0]];
 
 	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
 	cub->player = player_init(cub);
 	cub->zbuffer = zbuffer;
-	cub->sprite_order = sprite_order;
-	cub->sprite_dst = sprite_dist;
 	cub->num_rays = cub->r[0];
 	cub->rays = rays;
 	cub->img = &img;
