@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/25 16:54:20 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/26 14:35:22 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,11 +90,50 @@ void		sort_sprites(int *order, double *dst, int nb, t_sprite **sprites)
 	}
 }
 
+double		get_sprite_angle(t_player *player, double rot_angle, double sx, double sy)
+{
+	double	x_vector;
+	double y_vector;
+	double	angle;
+	double	s_angle;
+
+	x_vector = sx - player->x;
+	y_vector = sy - player->y ;
+	angle = atan2(y_vector, x_vector);
+	s_angle = angle - rot_angle;
+	//printf("sAngle = %f, a = %f\n", s_angle, angle);
+	return (s_angle);
+}
+
+int	ya = 0;
+
+double		ft_abs(double n)
+{
+	if (n < 0)
+		return (n * -1);
+	return (n);
+}
+
+int			is_visible(double sprite_angle, double fov)
+{
+	if (sprite_angle < -M_PI)
+		sprite_angle += 2 * M_PI;
+	if (sprite_angle >= M_PI)
+		sprite_angle -= 2 * M_PI;
+	return (ft_abs(sprite_angle) < ((fov / 2.0)));
+return (1);
+}
 void		sprite_casting(t_infos *cub)
 {
 	int i;
 	t_sprite *tmp;
 
+	i = -1;
+	while (++i < cub->sprites_nb)
+	{
+		cub->sprites[i]->angle = get_sprite_angle(cub->player, cub->player->rotation_angle, cub->sprites[i]->x * tile_size, cub->sprites[i]->y * tile_size);
+		cub->sprites[i]->is_visible = is_visible(cub->sprites[i]->angle, cub->player->fov_angle);
+	}
 	i = -1;
 	while (++i < cub->sprites_nb)
 	{
@@ -105,7 +144,6 @@ void		sprite_casting(t_infos *cub)
 				cub->sprites[i]->y * tile_size);
 	}
 	sort_sprites(cub->sprite_order, cub->sprite_dst, cub->sprites_nb, cub->sprites);
-	i = -1;
 }
 int bro = 0;
 
@@ -129,9 +167,7 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 		draw_wall(cub, i, (cub->r[1] / 2) -
 				(wall_height / 2), wall_height, ray);
 	}
-	if (bro == 0)
-		sprite_casting(cub);
-	bro = 1;
+	sprite_casting(cub);
 }
 
 void		draw_map(t_infos *cub, t_data *img)
