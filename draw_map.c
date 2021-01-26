@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 14:48:52 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/26 17:55:56 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,38 +20,6 @@ int			get_color(int color[])
 int			get_text_color(int *add, int pos)
 {
 	return (add[pos]);
-}
-
-void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
-{
-	int			i;
-	int			offset_x;
-	int			offset_y;
-	int			real_y;
-
-	i = -1;
-	real_y = y;
-	if (y < 0)
-		y = 0;
-	while (++i < y)
-		my_mlx_pixel_put(cub->img, x, i, cub->c);
-	i = -1;
-	if (ray->is_vrtcl_hit)
-		offset_x = (int)ray->wall_hitY % tile_size;
-	else
-		offset_x = (int)ray->wall_hitX % tile_size;
-	while (++i + y < cub->r[1])
-		if (i < height)
-		{
-			if (real_y < 0)
-				offset_y = ((i - real_y) * ((double) tile_size / height));
-			else
-				offset_y = ((i) * ((double) tile_size / height));
-			my_mlx_pixel_put(cub->img, x, y + i,
-					get_text_color((int *)cub->textures[ray->side_hit]->addr, tile_size * offset_y + offset_x));
-		}
-		else
-			my_mlx_pixel_put(cub->img, x, y + i, cub->f);
 }
 
 void		switch_sprites(t_sprite **s1, t_sprite **s2)
@@ -115,6 +83,84 @@ int			is_visible(double sprite_angle, double fov)
 	return (ft_abs(sprite_angle) < ((fov / 2.0)));
 return (1);
 }
+
+void		draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray)
+{
+	int			i;
+	int			offset_x;
+	int			offset_y;
+	int			real_y;
+
+	i = -1;
+	real_y = y;
+	if (y < 0)
+		y = 0;
+	while (++i < y)
+		my_mlx_pixel_put(cub->img, x, i, cub->c);
+	i = -1;
+	if (ray->is_vrtcl_hit)
+		offset_x = (int)ray->wall_hitY % tile_size;
+	else
+		offset_x = (int)ray->wall_hitX % tile_size;
+	while (++i + y < cub->r[1])
+		if (i < height)
+		{
+			if (real_y < 0)
+				offset_y = ((i - real_y) * ((double) tile_size / height));
+			else
+				offset_y = ((i) * ((double) tile_size / height));
+			my_mlx_pixel_put(cub->img, x, y + i,
+					get_text_color((int *)cub->textures[ray->side_hit]->addr, tile_size * offset_y + offset_x));
+		}
+		else
+			my_mlx_pixel_put(cub->img, x, y + i, cub->f);
+}
+
+
+void		draw_sprite(t_infos *cub, t_sprite *sprite, int size, int x, int y)
+{
+	int	i;
+	int	j;
+	int	real_y;
+	int	offset_x;
+	int	offset_y;
+
+	if (y < 0)
+		y = 0;
+	j = -1;
+	while (++j + x < 0)
+		;
+	while (j + x < cub->r[0] && j < size)
+	{
+		i = -1;
+		while (++i + y < cub->r[1] && i < size)
+		{
+			if (sprite->distance < cub->zbuffer[x + j])
+				my_mlx_pixel_put(cub->img, x + j, y + i, 0);
+		}
+		j++;
+	}
+}
+
+void		get_sprites_place(t_infos *cub, t_sprite **sprites)
+{
+	int		i;
+	double	h1;
+	int		start_top;
+	int		start_left;
+	i = -1;
+	while (++i < cub->sprites_nb)
+	{
+		if (sprites[i]->is_visible)
+		{
+			h1 = (tile_size / sprites[i]->distance * cos(sprites[i]->angle)) * cub->proj_plane_dist;
+			start_top = (cub->r[1] / 2) - (h1 / 2);
+			start_left = tan(sprites[i]->angle) * cub->proj_plane_dist + (cub->r[0] / 2) - (h1 / 2);
+			draw_sprite(cub, sprites[i], h1, start_left, start_top);
+		}
+	}
+}
+
 void		sprite_casting(t_infos *cub)
 {
 	int i;
@@ -130,6 +176,7 @@ void		sprite_casting(t_infos *cub)
 		cub->sprites[i]->is_visible = is_visible(cub->sprites[i]->angle, cub->player->fov_angle);
 	}
 	sort_sprites(cub->sprites_nb, cub->sprites);
+	get_sprites_place(cub, cub->sprites);
 }
 
 void		draw_3d_map(t_infos *cub, t_data *img)
@@ -147,8 +194,7 @@ void		draw_3d_map(t_infos *cub, t_data *img)
 		correct = ray->distance * cos(ray->ray_angle -
 				cub->player->rotation_angle);
 		cub->zbuffer[i] = correct;
-		proj_plane_dist = (cub->r[0] / 2) / tan(cub->player->fov_angle / 2);
-		wall_height = (tile_size / correct) * proj_plane_dist;
+		wall_height = (tile_size / correct) * cub->proj_plane_dist;
 		draw_wall(cub, i, (cub->r[1] / 2) -
 				(wall_height / 2), wall_height, ray);
 	}
@@ -198,6 +244,7 @@ int			launch_game(t_infos *cub)
 	cub->win = mlx_new_window(cub->mlx, cub->r[0], cub->r[1], "cub3d");
 	cub->player = player_init(cub);
 	cub->zbuffer = zbuffer;
+	cub->proj_plane_dist = (cub->r[0] / 2) / tan(cub->player->fov_angle / 2);
 	cub->num_rays = cub->r[0];
 	cub->rays = rays;
 	cub->img = &img;

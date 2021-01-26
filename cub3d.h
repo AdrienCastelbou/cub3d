@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 14:46:46 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/26 14:56:09 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ typedef struct	s_infos {
 		char		**map;
 		void		*mlx;
 		void		*win;
+		double		proj_plane_dist;
 		t_player	*player;
 		t_data		*img;
 		int			num_rays;

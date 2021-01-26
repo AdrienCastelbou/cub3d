@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:27:37 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 14:30:33 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/26 17:20:32 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,8 +126,8 @@ t_sprite	**get_sprites_pos(t_infos *cub, char **map)
 			if (map[i][j] == '2')
 			{
 				sprites[index] = malloc(sizeof(t_sprite));
-				sprites[index]->x = j;
-				sprites[index]->y = i;
+				sprites[index]->x = j + 0.5;
+				sprites[index]->y = i + 0.5;
 				index += 1;
 			}
 	}
