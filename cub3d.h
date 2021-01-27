@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/27 15:24:31 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 16:35:03 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,6 @@ typedef struct	s_infos {
 		int			s_transparency;
 		t_sprite	**sprites;
 		int			sprites_nb;
-		double		*zbuffer;
 }				t_infos;
 
 typedef	struct	s_hrzt_hit_checker {

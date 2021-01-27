@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:56 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/22 14:31:59 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 16:39:39 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,9 +112,11 @@ void		get_wall_position(t_ray *ray, t_player *player, t_infos *cub)
 	ray->distance = horizontal_hit;
 	vertical_hit = check_vertical_hit(ray, player, cub);
 	if (horizontal_hit < vertical_hit)
-		ray->distance = horizontal_hit;
+		ray->distance = horizontal_hit * cos(ray->ray_angle -
+				cub->player->rotation_angle);
 	else
-		ray->distance = vertical_hit;
+		ray->distance = vertical_hit * cos(ray->ray_angle -
+				cub->player->rotation_angle);
 	if (ray->is_vrtcl_hit && ray->is_go_left)
 		ray->side_hit = 3;
 	else if (ray->is_vrtcl_hit && !ray->is_go_left)
