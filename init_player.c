@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:56:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 14:25:25 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 12:06:30 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@ void		get_player_infos(t_infos *cub, t_player *player)
 		while (cub->map[i][++j])
 			if (ft_strchr("SNEW", cub->map[i][j]))
 			{
-				player->x = j * tile_size;
-				player->y = i * tile_size;
+				player->x = (j + 0.5) * tile_size;
+				player->y = (i + 0.5) * tile_size;
 				player->rotation_angle = get_start_angle(cub->map[i][j]);
 				cub->map[i][j] = '0';
 			}
