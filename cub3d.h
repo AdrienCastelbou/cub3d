@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 14:56:09 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 15:24:31 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ typedef struct	s_infos {
 		int			f;
 		int			c;
 		char		**map;
+		int			max_len;
 		void		*mlx;
 		void		*win;
 		double		proj_plane_dist;

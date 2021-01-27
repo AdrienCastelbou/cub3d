@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:27:37 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/26 17:20:32 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 15:42:49 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,44 @@ t_sprite	**get_sprites_pos(t_infos *cub, char **map)
 	return (sprites);
 }
 
+char		*resize_line(char *s, int len, int size)
+{
+	char	*new;
+	char	*dst;
+	int		i;
+	int		new_len;
+
+	new_len = size - len;
+	new = malloc(sizeof(char) * (new_len + 1));
+	if (!new)
+		return (NULL);
+	i = -1;
+	while (++i < new_len)
+		new[i] = ' ';
+	new[i] = 0;
+	dst = ft_strjoin(s, new);
+	free(new);
+	return (dst);
+}
+
+void		resize_map(t_infos *cub, char **map)
+{
+	int		i;
+	int		j;
+	char	*tmp;
+	i = -1;
+	while (map[++i])
+	{
+		j = ft_strlen(map[i]);
+		if (j < cub->max_len)
+		{
+			tmp = map[i];
+			map[i] = resize_line(map[i], j, cub->max_len);
+			free(tmp);
+		}
+	}
+}
+
 int			read_file(t_infos *cub, int fd)
 {
 	int		ret;
@@ -158,6 +196,7 @@ int			read_file(t_infos *cub, int fd)
 		free(line);
 		ret = get_next_line(fd, &line);
 	}
+	resize_map(cub, cub->map);
 	if (cub->sprites_nb > 0)
 		cub->sprites = get_sprites_pos(cub, cub->map);
 	cub->s_transparency = get_text_color((int*)cub->s->addr, 0);

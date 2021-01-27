@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 14:59:38 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/25 15:56:56 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 15:27:00 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,8 @@ int		map_is_valid(char **map, t_infos *cub)
 			if (ft_strchr("NSEW", map[i][j]))
 				player_position += 1;
 		}
+		if (j > cub->max_len)
+			cub->max_len = j;
 	}
 	if (!player_position || player_position > 1)
 		return (0);
@@ -141,6 +143,7 @@ int		parse_map(char *line, t_infos *cub, int fd)
 		free(line);
 	}
 	map = ft_split(joined_map, '\n');
+	cub->max_len = 0;
 	cub->map = map;
 	if (map_is_valid(map, cub))
 		return (1);
