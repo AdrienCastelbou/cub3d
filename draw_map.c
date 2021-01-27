@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/27 10:17:03 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 11:23:12 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ void		draw_sprite(t_infos *cub, t_sprite *sprite, int size, int x, int y)
 		{
 			offset_y = ((i) * ((double) tile_size / size));
 			color =  get_text_color((int *)cub->s->addr, tile_size * offset_y + offset_x);
-			if (sprite->distance < cub->zbuffer[x + j] && color != cub->s_transparency)
+			if (sprite->distance < cub->rays[x + j].distance && color != cub->s_transparency)
 				my_mlx_pixel_put(cub->img, x + j, y + i, color);
 		}
 		j++;
@@ -155,12 +155,13 @@ void		get_sprites_place(t_infos *cub, t_sprite **sprites)
 	double	h1;
 	int		start_top;
 	int		start_left;
+
 	i = -1;
 	while (++i < cub->sprites_nb)
 	{
 		if (sprites[i]->is_visible)
 		{
-			h1 = (tile_size / sprites[i]->distance * cos(sprites[i]->angle)) * cub->proj_plane_dist;
+			h1 = (tile_size / sprites[i]->distance) * cub->proj_plane_dist;
 			start_top = (cub->r[1] / 2) - (h1 / 2);
 			start_left = tan(sprites[i]->angle) * cub->proj_plane_dist + (cub->r[0] / 2) - (h1 / 2);
 			draw_sprite(cub, sprites[i], h1, start_left, start_top);
@@ -179,8 +180,10 @@ void		sprite_casting(t_infos *cub)
 				cub->player->y,
 				cub->sprites[i]->x * tile_size,
 				cub->sprites[i]->y * tile_size);
-		cub->sprites[i]->angle = get_sprite_angle(cub->player, cub->player->rotation_angle, cub->sprites[i]->x * tile_size, cub->sprites[i]->y * tile_size);
+		cub->sprites[i]->angle = get_sprite_angle(cub->player, ft_abs_angle(cub->player->rotation_angle), cub->sprites[i]->x * tile_size, cub->sprites[i]->y * tile_size
+);
 		cub->sprites[i]->is_visible = is_visible(cub->sprites[i]->angle, cub->player->fov_angle);
+
 	}
 	sort_sprites(cub->sprites_nb, cub->sprites);
 	get_sprites_place(cub, cub->sprites);
