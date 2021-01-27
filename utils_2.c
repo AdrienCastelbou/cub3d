@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:03:55 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/21 11:23:27 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 11:40:22 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int			check_collisions(int movestep, t_infos *cub)
 			cub->player->lateral_move) * movestep;
 	next_y = cub->player->y + sin(cub->player->rotation_angle +
 			cub->player->lateral_move) * movestep;
-	if (cub->map[next_y / tile_size][next_x / tile_size] != '1')
+	if (cub->map[next_y / tile_size][next_x / tile_size] == '0')
 		return (0);
 	return (1);
 }
