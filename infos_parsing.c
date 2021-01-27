@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:27:37 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/27 15:42:49 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/27 16:24:19 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,17 +65,20 @@ int		get_field_and_sky_infos(char *line, int *color, int len, t_infos *cub)
 {
 	int	i;
 	int	index;
-	int	set[len];
+	int	bits;
 
 	cub->game_infos += 1;
 	i = -1;
 	index = 0;
+	*color = 0;
+	bits = 16;
 	printf("Try to get colors infos in < %s > ...", line);
 	while (line[++i] && index < len)
 	{
 		if ((line[i] >= '0' && line[i] <= '9'))
 		{
-			set[index] = ft_atoi(line + i);
+			*color = *color | (ft_atoi(line + i) << bits);
+			bits -= 8;
 			index++;
 			while (line[i] && (line[i] >= '0' && line[i] <= '9'))
 				i++;
