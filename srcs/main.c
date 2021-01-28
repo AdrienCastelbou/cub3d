@@ -6,11 +6,11 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 11:17:47 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/27 16:35:16 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/28 14:06:58 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../includes/cub3d.h"
 
 typedef struct		s_bmp_header {
 		char		bitmap_signature_bytes[2];
@@ -45,7 +45,7 @@ void		create_saved_img(t_infos *cub, t_data *img)
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
 			&img->line_length, &img->endian);
 	raycast(cub);
-	draw_3d_map(cub, img);
+	draw_3d_map(cub);
 	draw_grid(*cub, img);
 	draw_player(*cub, img);
 	draw_rays(cub, img);
@@ -54,6 +54,7 @@ void		create_saved_img(t_infos *cub, t_data *img)
 void		bmp_header_init(t_bmp_header *header,
 		t_bmp_infos_header *infos_header, t_infos *cub)
 {
+	cub->r[0] = cub->r[0];
 	header->bitmap_signature_bytes[0] = 'B';
 	header->bitmap_signature_bytes[1] = 'M';
 	infos_header->sizeOfThisHeader = 40;
@@ -77,7 +78,7 @@ void		write_bmp_file(t_infos *cub, int fd)
 	t_bmp_header		bmp_header;
 	t_bmp_infos_header	bmp_infos_header;
 	t_pixel				pixel;
-	size_t				pixels_number;
+	int				pixels_number;
 	int					i;
 
 	bmp_header_init(&bmp_header, &bmp_infos_header, cub);

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../includes/cub3d.h"
 
 double		check_hrztl_hit_by_step(t_infos *cub, t_player *player,
 		t_ray *ray, t_hrztl_hit_checker checker)

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../includes/cub3d.h"
 
 int			is_in_the_grid(t_infos *cub, double yintercept, double xintercept)
 {

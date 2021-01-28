@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../includes/cub3d.h"
 
 char	*ft_strjoin_sup(char const *s1, char const *s2, char c)
 {

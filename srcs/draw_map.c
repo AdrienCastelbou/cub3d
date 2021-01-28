@@ -6,11 +6,11 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:47:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/27 16:42:02 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/28 14:04:41 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../includes/cub3d.h"
 
 int			get_color(int color[])
 {
@@ -189,11 +189,10 @@ void		sprite_casting(t_infos *cub)
 	get_sprites_place(cub, cub->sprites);
 }
 
-void		draw_3d_map(t_infos *cub, t_data *img)
+void		draw_3d_map(t_infos *cub)
 {
 	int		i;
 	t_ray	*ray;
-	double	proj_plane_dist;
 	double	wall_height;
 
 	i = -1;
@@ -214,7 +213,7 @@ void		draw_map(t_infos *cub, t_data *img)
 	img->addr = mlx_get_data_addr(img->img, &img->bits_per_pixel,
 			&img->line_length, &img->endian);
 	raycast(cub);
-	draw_3d_map(cub, img);
+	draw_3d_map(cub);
 	draw_grid(*cub, img);
 	draw_player(*cub, img);
 	draw_rays(cub, img);

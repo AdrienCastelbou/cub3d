@@ -6,11 +6,11 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 15:56:03 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/27 12:06:30 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/28 14:05:34 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cub3d.h"
+#include "../includes/cub3d.h"
 
 double		get_start_angle(char c)
 {
@@ -27,7 +27,6 @@ void		get_player_infos(t_infos *cub, t_player *player)
 {
 	int		i;
 	int		j;
-	char	c;
 
 	i = -1;
 	while (cub->map[++i])

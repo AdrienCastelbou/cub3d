@@ -6,7 +6,7 @@
 /*   By: acastelb <acastelb@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 11:25:14 by acastelb          #+#    #+#             */
-/*   Updated: 2021/01/27 16:35:03 by acastelb         ###   ########.fr       */
+/*   Updated: 2021/01/28 14:11:18 by acastelb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@
 # include <stdlib.h>
 # include <math.h>
 # include <string.h>
-# include "minilibx_opengl_20191021/mlx.h"
+# include "../mlx/mlx.h"
 # include <fcntl.h>
 # include <stdint.h>
-# include "gnl/get_next_line.h"
-# include "libft/libft.h"
+# include "../libft/get_next_line.h"
+# include "../libft/libft.h"
 # define INT_MAX 2147483647
 #define tile_size  64
 #define	minimap_scale 0.2
@@ -121,7 +121,7 @@ t_ray			*ray_init(double ray_angle, t_ray *ray);
 void			draw_rays(t_infos *vars, t_data *img);
 void			raycast(t_infos *vars);
 void			draw_wall(t_infos *cub, int x, int y, int height, t_ray *ray);
-void			draw_3d_map(t_infos *cub, t_data *img);
+void			draw_3d_map(t_infos *cub);
 void			draw_map(t_infos *cub, t_data *img);
 int				key_hook(int keycode, t_infos *cub);
 int				key_release_hook(int keycode, t_infos *cub);
